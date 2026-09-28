@@ -172,35 +172,64 @@ label{display:block;font-size:0.75rem;font-weight:800;text-transform:uppercase;l
       <div class="subtitle">Crooked Billet</div>
     </div>
     <span id="conn" class="badge badge-err" style="margin-left:auto">🔒 Locked</span>
+    <button class="secondary sm" id="adminBtn">⚙ Admin</button>
   </header>
   <div class="container">
-    <div class="form-row" style="margin-bottom:1rem">
-      <input id="search" placeholder="🔎 Search questions, answers, info…"/>
-      <button id="addQBtn">+ Add Question</button>
-    </div>
-
-    <div class="cat-grid" id="cats"></div>
-
-    <div class="card" style="padding:1rem">
-      <div class="form-row">
-        <input id="newCat" placeholder="New category name…"/>
-        <button id="addCatBtn" class="secondary">+ Category</button>
+    <div id="mainView">
+      <div class="form-row" style="margin-bottom:1rem">
+        <input id="search" placeholder="🔎 Search questions, answers, info…"/>
+        <button id="addQBtn">+ Add Question</button>
       </div>
-      <div class="btn-row" id="catManage" style="margin-top:.7rem;display:none">
-        <span style="color:var(--muted);font-size:.8rem;font-weight:700">Selected: <span id="selCatName" style="color:var(--accent)"></span></span>
-        <button class="secondary sm" id="renameCatBtn">Rename</button>
-        <button class="danger sm" id="delCatBtn">Delete</button>
+
+      <div class="cat-grid" id="cats"></div>
+
+      <div class="filters">
+        <select id="fAuthor"></select>
+        <select id="fStatus"></select>
       </div>
+
+      <div class="section-title" id="listTitle">Questions</div>
+      <div id="list"><div class="loading"><div class="spinner"></div>Loading…</div></div>
+      <div style="height:3rem"></div>
     </div>
 
-    <div class="filters">
-      <select id="fAuthor"></select>
-      <select id="fStatus"></select>
-    </div>
+    <div id="adminView" style="display:none">
+      <div class="btn-row" style="margin-bottom:1rem">
+        <button class="secondary" id="adminBack">← Back to questions</button>
+      </div>
 
-    <div class="section-title" id="listTitle">Questions</div>
-    <div id="list"><div class="loading"><div class="spinner"></div>Loading…</div></div>
-    <div style="height:3rem"></div>
+      <div class="section-title">Categories</div>
+      <div class="card">
+        <div class="form-row">
+          <input id="newCat" placeholder="New category name…"/>
+          <button id="addCatBtn">+ Add category</button>
+        </div>
+      </div>
+      <div id="catList"></div>
+
+      <div class="section-title">Authors</div>
+      <div class="card">
+        <div class="form-row">
+          <input id="newAuthor" placeholder="New author name…"/>
+          <button id="addAuthorBtn">+ Add author</button>
+        </div>
+      </div>
+      <div id="authorList"></div>
+
+      <div class="section-title">Data</div>
+      <div class="card">
+        <p style="font-size:.8rem;color:var(--muted);font-weight:600;margin-bottom:.85rem">Export a backup, bulk-import questions from a spreadsheet, or wipe the question bank clean. Category and Author columns in an import are matched by name — categories/authors not seen before are added automatically.</p>
+        <div class="btn-row" style="margin-bottom:.85rem">
+          <button class="secondary" id="exportBtn">⬇ Export to CSV</button>
+          <button class="secondary" id="importBtn">⬆ Import CSV</button>
+          <input type="file" id="importFile" accept=".csv" style="display:none"/>
+        </div>
+        <div class="btn-row">
+          <button class="danger" id="clearBtn">🗑 Clear all questions</button>
+        </div>
+      </div>
+      <div style="height:3rem"></div>
+    </div>
   </div>
 </div>
 
@@ -294,10 +323,12 @@ function askText(title, msg, initial) {
     $('txtIn').onkeydown = e => { if (e.key === 'Enter') done($('txtIn').value.trim()); };
   });
 }
-function askConfirm(title, msg) {
+function askConfirm(title, msg, confirmLabel, danger) {
+  confirmLabel = confirmLabel || 'Delete';
+  danger = danger === undefined ? true : danger;
   return new Promise(resolve => {
     openModal(`<h3>${esc(title)}</h3><p>${esc(msg)}</p>
-      <div class="btn-row"><button id="cOk" class="danger" style="flex:1">Delete</button><button id="cNo" class="secondary" style="flex:1">Cancel</button></div>`);
+      <div class="btn-row"><button id="cOk" class="${danger ? 'danger' : ''}" style="flex:1">${esc(confirmLabel)}</button><button id="cNo" class="secondary" style="flex:1">Cancel</button></div>`);
     $('cOk').onclick = () => { closeModal(); resolve(true); };
     $('cNo').onclick = () => { closeModal(); resolve(false); };
   });
@@ -310,9 +341,6 @@ function render() {
   $('cats').innerHTML =
     `<div class="stat-card cat-card ${!activeCat ? 'active' : ''}" data-cat=""><div class="stat-value">${rows.length}</div><div class="stat-label">All</div></div>` +
     categories.map(c => `<div class="stat-card cat-card ${activeCat === c ? 'active' : ''}" data-cat="${esc(c)}"><div class="stat-value">${counts[c] || 0}</div><div class="stat-label">${esc(c)}</div></div>`).join('');
-
-  $('catManage').style.display = activeCat ? 'flex' : 'none';
-  $('selCatName').textContent = activeCat;
 
   const fa = $('fAuthor').value, fs = $('fStatus').value;
   $('fAuthor').innerHTML = `<option value="">All Authors</option>` + people.map(p => `<option ${p === fa ? 'selected' : ''}>${esc(p)}</option>`).join('');
@@ -327,28 +355,55 @@ function render() {
     (!q || r.values.some(v => v.toLowerCase().includes(q))));
 
   $('listTitle').textContent = `${activeCat || 'All Categories'} · ${shown.length} question${shown.length === 1 ? '' : 's'}`;
-  if (!shown.length) { $('list').innerHTML = `<div class="empty">No questions match.</div>`; return; }
-
-  $('list').innerHTML = shown.slice().reverse().map(r => {
-    const st = get(r, 'Status').trim(), pts = get(r, 'Points').trim(), rd = get(r, 'Round').trim();
-    const meta = [get(r, 'Author') && '👤 ' + get(r, 'Author'), rd && 'Round ' + rd, get(r, 'Last Edited') && 'Edited ' + get(r, 'Last Edited')].filter(Boolean);
-    return `<div class="q-card">
-      <div class="q-top">
-        <span class="q-cat">${esc(get(r, 'Category') || 'Uncategorised')}</span>
-        ${st ? `<span class="pill status-${esc(st.toLowerCase())}">${esc(st)}</span>` : ''}
-        ${pts ? `<span class="pill pts">${esc(pts)} pt${pts === '1' ? '' : 's'}</span>` : ''}
-        <span class="q-id">${esc(get(r, 'ID'))}</span>
-        <div class="q-actions">
-          <button class="secondary sm" data-edit="${r.row}">Edit</button>
-          <button class="danger sm" data-del="${r.row}">Delete</button>
+  if (!shown.length) { $('list').innerHTML = `<div class="empty">No questions match.</div>`; }
+  else {
+    $('list').innerHTML = shown.slice().reverse().map(r => {
+      const st = get(r, 'Status').trim(), pts = get(r, 'Points').trim(), rd = get(r, 'Round').trim(), qn = get(r, 'Question Number').trim();
+      const meta = [get(r, 'Author') && '👤 ' + get(r, 'Author'), rd && 'Round ' + rd, qn && 'No. ' + qn, get(r, 'Last Edited') && 'Edited ' + get(r, 'Last Edited')].filter(Boolean);
+      return `<div class="q-card">
+        <div class="q-top">
+          <span class="q-cat">${esc(get(r, 'Category') || 'Uncategorised')}</span>
+          ${st ? `<span class="pill status-${esc(st.toLowerCase())}">${esc(st)}</span>` : ''}
+          ${pts ? `<span class="pill pts">${esc(pts)} pt${pts === '1' ? '' : 's'}</span>` : ''}
+          <span class="q-id">${esc(get(r, 'ID'))}</span>
+          <div class="q-actions">
+            <button class="secondary sm" data-edit="${r.row}">Edit</button>
+            <button class="danger sm" data-del="${r.row}">Delete</button>
+          </div>
         </div>
+        <div class="q-text">${esc(get(r, 'Question'))}</div>
+        <div class="q-answer">${esc(get(r, 'Answer'))}</div>
+        ${get(r, 'Extra Information') ? `<div class="q-info">${esc(get(r, 'Extra Information'))}</div>` : ''}
+        ${meta.length ? `<div class="q-meta">${meta.map(esc).map(m => `<span>${m}</span>`).join('')}</div>` : ''}
+      </div>`;
+    }).join('');
+  }
+
+  renderCatList();
+  renderAuthorList();
+}
+
+function renderCatList() {
+  const counts = {}; rows.forEach(r => { const c = get(r, 'Category').trim(); if (c) counts[c] = (counts[c] || 0) + 1; });
+  $('catList').innerHTML = categories.length ? categories.map(c => `
+    <div class="q-card" style="display:flex;align-items:center;gap:.6rem">
+      <div style="flex:1"><span class="q-text">${esc(c)}</span> <span class="q-extra">${counts[c] || 0} question${counts[c] === 1 ? '' : 's'}</span></div>
+      <div class="q-actions">
+        <button class="secondary sm" data-rename-cat="${esc(c)}">Rename</button>
+        <button class="danger sm" data-del-cat="${esc(c)}">Delete</button>
       </div>
-      <div class="q-text">${esc(get(r, 'Question'))}</div>
-      <div class="q-answer">${esc(get(r, 'Answer'))}</div>
-      ${get(r, 'Extra Information') ? `<div class="q-info">${esc(get(r, 'Extra Information'))}</div>` : ''}
-      ${meta.length ? `<div class="q-meta">${meta.map(esc).map(m => `<span>${m}</span>`).join('')}</div>` : ''}
-    </div>`;
-  }).join('');
+    </div>`).join('') : '<div class="empty">No categories yet.</div>';
+}
+
+function renderAuthorList() {
+  const counts = {}; rows.forEach(r => { const a = get(r, 'Author').trim(); if (a) counts[a] = (counts[a] || 0) + 1; });
+  $('authorList').innerHTML = people.length ? people.map(p => `
+    <div class="q-card" style="display:flex;align-items:center;gap:.6rem">
+      <div style="flex:1"><span class="q-text">${esc(p)}</span> <span class="q-extra">${counts[p] || 0} question${counts[p] === 1 ? '' : 's'}</span></div>
+      <div class="q-actions">
+        <button class="danger sm" data-del-author="${esc(p)}">Delete</button>
+      </div>
+    </div>`).join('') : '<div class="empty">No authors yet.</div>';
 }
 
 /* ============ QUESTION FORM ============ */
@@ -369,15 +424,17 @@ function questionForm(existing) {
   if (has('Question')) f.push(`<div class="field"><label>Question</label><textarea data-f="Question" rows="3">${esc(v('Question'))}</textarea></div>`);
   if (has('Answer')) f.push(`<div class="field"><label>Answer</label><input data-f="Answer" value="${esc(v('Answer'))}"/></div>`);
   if (has('Extra Information')) f.push(`<div class="field"><label>Extra Information</label><textarea data-f="Extra Information" rows="2">${esc(v('Extra Information'))}</textarea></div>`);
+  const row3 = [];
+  if (has('Points')) row3.push(`<div class="field"><label>Points</label><input data-f="Points" type="number" min="0" step="1" value="${esc(v('Points'))}"/></div>`);
+  if (has('Round')) row3.push(`<div class="field"><label>Round</label><input data-f="Round" value="${esc(v('Round'))}"/></div>`);
+  if (has('Question Number')) row3.push(`<div class="field"><label>Question Number</label><input data-f="Question Number" value="${esc(v('Question Number'))}"/></div>`);
   const g = [];
-  if (has('Points')) g.push(`<div class="field"><label>Points</label><input data-f="Points" type="number" min="0" step="1" value="${esc(v('Points'))}"/></div>`);
-  if (has('Round')) g.push(`<div class="field"><label>Round</label><input data-f="Round" value="${esc(v('Round'))}"/></div>`);
   if (has('Author')) g.push(`<div class="field"><label>Author</label><select data-f="Author">${opts(people, auth, true)}</select></div>`);
   if (has('Status')) g.push(`<div class="field"><label>Status</label><select data-f="Status">${opts(statuses(), stat, false)}</select></div>`);
 
   openModal(`<h3>${existing ? 'Edit question' : 'Add question'}${existing && v('ID') ? ' · ' + esc(v('ID')) : ''}</h3>
     <p>${existing ? 'Saves straight to the sheet.' : 'Adds a new row to the sheet with an automatic ID and date.'}</p>
-    ${f.join('')}<div class="grid2">${g.join('')}</div>
+    ${f.join('')}${row3.length ? `<div class="grid2" style="grid-template-columns:repeat(${row3.length},1fr)">${row3.join('')}</div>` : ''}<div class="grid2">${g.join('')}</div>
     <div class="btn-row"><button id="qSave" style="flex:1">Save</button><button id="qCancel" class="secondary" style="flex:1">Cancel</button></div>`);
 
   $('qCancel').onclick = closeModal;
@@ -422,6 +479,89 @@ function questionForm(existing) {
   };
 }
 
+/* ============ CATEGORY / AUTHOR FLOWS ============ */
+async function renameCategoryFlow(from) {
+  const to = await askText('Rename category', `Rename "${from}" and update all its questions.`, from);
+  if (!to || to === from) return;
+  run(async () => { await api('renameCategory', { from, to }); if (activeCat === from) activeCat = to; await load(); }, 'Category renamed');
+}
+async function deleteCategoryFlow(name) {
+  const ok = await askConfirm('Delete category?', `"${name}" will be removed. It must have no questions.`);
+  if (!ok) return;
+  run(async () => { await api('deleteCategory', { name }); if (activeCat === name) activeCat = ''; await load(); }, 'Category deleted');
+}
+async function deleteAuthorFlow(name) {
+  const ok = await askConfirm('Delete author?', `"${name}" will be removed from the author list. It must have no questions assigned.`);
+  if (!ok) return;
+  run(async () => { await api('deletePerson', { name }); await load(); }, 'Author deleted');
+}
+
+/* ============ EXPORT / IMPORT / CLEAR ============ */
+function csvField(v) {
+  v = String(v ?? '');
+  return /[",\n\r]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
+}
+function exportCSV() {
+  if (!rows.length) return toast('No questions to export', true);
+  const lines = [headers.map(csvField).join(',')];
+  rows.forEach(r => lines.push(headers.map((h, i) => csvField(r.values[i])).join(',')));
+  const csv = '\uFEFF' + lines.join('\r\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `crooked-billet-questions-${new Date().toISOString().slice(0, 10)}.csv`;
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+}
+
+function parseCSV(text) {
+  const table = []; let row = [], field = '', inQuotes = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (inQuotes) {
+      if (c === '"') { if (text[i + 1] === '"') { field += '"'; i++; } else inQuotes = false; }
+      else field += c;
+    } else {
+      if (c === '"') inQuotes = true;
+      else if (c === ',') { row.push(field); field = ''; }
+      else if (c === '\r') { /* skip */ }
+      else if (c === '\n') { row.push(field); table.push(row); row = []; field = ''; }
+      else field += c;
+    }
+  }
+  if (field.length || row.length) { row.push(field); table.push(row); }
+  return table.filter(r => !(r.length === 1 && r[0] === ''));
+}
+
+async function importCSVFile(file) {
+  const text = await file.text();
+  let table;
+  try { table = parseCSV(text); } catch (e) { return toast('Could not read that file', true); }
+  if (table.length < 2) return toast('No data rows found in that file', true);
+  const fileHeaders = table[0].map(h => h.trim());
+  const items = table.slice(1).map(cols => {
+    const obj = {};
+    fileHeaders.forEach((h, i) => {
+      const k = h.toLowerCase();
+      if (k === 'id' || k === 'date added' || k === 'last edited') return;
+      obj[h] = cols[i] != null ? cols[i] : '';
+    });
+    return obj;
+  }).filter(obj => Object.values(obj).some(v => String(v).trim()));
+  if (!items.length) return toast('No usable rows found in that file', true);
+  const ok = await askConfirm('Import questions?', `Add ${items.length} question${items.length === 1 ? '' : 's'} from this file? New IDs and dates will be assigned, and any new categories or authors will be created automatically.`, 'Import', false);
+  if (!ok) return;
+  run(async () => { await api('importQuestions', { items }); await load(); }, `Imported ${items.length} question${items.length === 1 ? '' : 's'}`);
+}
+
+async function clearAllFlow() {
+  if (!rows.length) return toast('There are no questions to clear', true);
+  const typed = await askText('Clear all questions?', `This permanently deletes all ${rows.length} questions from the sheet (categories and authors are kept). Type DELETE to confirm.`, '');
+  if (typed === null) return;
+  if (typed !== 'DELETE') return toast('Not confirmed — nothing was deleted', true);
+  run(async () => { await api('clearQuestions'); await load(); }, 'All questions cleared');
+}
+
 /* ============ EVENTS ============ */
 $('cats').addEventListener('click', e => {
   const c = e.target.closest('.cat-card'); if (!c) return;
@@ -440,24 +580,47 @@ $('list').addEventListener('click', async e => {
   }
 });
 
+$('catList').addEventListener('click', e => {
+  const rn = e.target.closest('[data-rename-cat]'), dl = e.target.closest('[data-del-cat]');
+  if (rn) renameCategoryFlow(rn.dataset.renameCat);
+  if (dl) deleteCategoryFlow(dl.dataset.delCat);
+});
+
+$('authorList').addEventListener('click', e => {
+  const dl = e.target.closest('[data-del-author]'); if (!dl) return;
+  deleteAuthorFlow(dl.dataset.delAuthor);
+});
+
 $('addCatBtn').onclick = () => {
   const name = $('newCat').value.trim();
   if (!name) return toast('Enter a category name', true);
-  run(async () => { await api('addCategory', { name }); $('newCat').value = ''; activeCat = name; await load(); }, 'Category added');
+  run(async () => { await api('addCategory', { name }); $('newCat').value = ''; await load(); }, 'Category added');
 };
 $('newCat').onkeydown = e => { if (e.key === 'Enter') $('addCatBtn').click(); };
 
-$('renameCatBtn').onclick = async () => {
-  const from = activeCat;
-  const to = await askText('Rename category', `Rename "${from}" and update all its questions.`, from);
-  if (!to || to === from) return;
-  run(async () => { await api('renameCategory', { from, to }); activeCat = to; await load(); }, 'Category renamed');
+$('addAuthorBtn').onclick = () => {
+  const name = $('newAuthor').value.trim();
+  if (!name) return toast('Enter an author name', true);
+  run(async () => { await api('addPerson', { name }); $('newAuthor').value = ''; await load(); }, 'Author added');
 };
-$('delCatBtn').onclick = async () => {
-  const name = activeCat;
-  if (await askConfirm('Delete category?', `"${name}" will be removed. It must have no questions.`)) {
-    run(async () => { await api('deleteCategory', { name }); activeCat = ''; await load(); }, 'Category deleted');
-  }
+$('newAuthor').onkeydown = e => { if (e.key === 'Enter') $('addAuthorBtn').click(); };
+
+$('exportBtn').onclick = exportCSV;
+$('importBtn').onclick = () => $('importFile').click();
+$('importFile').onchange = e => {
+  const file = e.target.files[0]; e.target.value = '';
+  if (file) importCSVFile(file);
+};
+$('clearBtn').onclick = clearAllFlow;
+
+$('adminBtn').onclick = () => {
+  $('mainView').style.display = 'none';
+  $('adminView').style.display = '';
+  renderCatList(); renderAuthorList();
+};
+$('adminBack').onclick = () => {
+  $('adminView').style.display = 'none';
+  $('mainView').style.display = '';
 };
 
 $('addQBtn').onclick = () => { if (headers.length) questionForm(null); };
