@@ -67,13 +67,27 @@ input::placeholder,textarea::placeholder{color:#5a4e28;font-weight:500}
 label{display:block;font-size:0.75rem;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-bottom:0.35rem}
 .field{margin-bottom:0.85rem}
 
-.q-card{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:0.85rem 1rem;margin-bottom:0.6rem;transition:all .15s}
+.q-card{background:var(--surface2);border:1px solid var(--border);border-left:5px solid var(--border);border-radius:12px;padding:.95rem 1rem;margin-bottom:.65rem;transition:all .15s}
 .q-card:hover{background:rgba(245,200,0,0.08);border-color:var(--accent)}
-.q-top{display:flex;align-items:center;gap:.5rem;margin-bottom:.4rem}
-.q-cat{font-size:0.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);background:rgba(245,200,0,0.12);border:1px solid rgba(245,200,0,0.3);border-radius:99px;padding:.15rem .6rem}
+.q-top{display:flex;align-items:center;gap:.5rem;margin-bottom:.55rem}
+.q-cat{font-size:.68rem;font-weight:900;text-transform:uppercase;letter-spacing:.06em;border-radius:99px;padding:.18rem .65rem;border:1px solid currentColor}
+.q-number{font-size:.7rem;font-weight:800;color:var(--muted);white-space:nowrap}
 .q-actions{margin-left:auto;display:flex;gap:.4rem}
-.q-text{font-weight:700;color:var(--text);line-height:1.4}
-.q-answer{font-weight:800;color:var(--accent);margin-top:.35rem}
+.q-text{font-size:1rem;font-weight:800;color:var(--text);line-height:1.5;margin:.15rem 0 .55rem}
+.q-answer-row{display:flex;align-items:center;gap:.55rem;margin-top:.25rem}
+.q-answer{font-weight:900;margin-top:0;line-height:1.4}
+.q-answer-label{font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:900}
+.answer-reveal{min-width:108px}
+.hidden{display:none!important}
+.cat-geography{color:#38bdf8;background:rgba(56,189,248,.12)}
+.cat-entertainment{color:#c084fc;background:rgba(192,132,252,.12)}
+.cat-history{color:#fbbf24;background:rgba(251,191,36,.12)}
+.cat-art-literature{color:#f472b6;background:rgba(244,114,182,.12)}
+.cat-science{color:#4ade80;background:rgba(74,222,128,.12)}
+.cat-sports-leisure{color:#f87171;background:rgba(248,113,113,.12)}
+.cat-name-year{color:#fb923c;background:rgba(251,146,60,.12)}
+.cat-other{color:var(--accent);background:rgba(245,200,0,.12)}
+.q-card.cat-geography{border-left-color:#38bdf8}.q-card.cat-entertainment{border-left-color:#c084fc}.q-card.cat-history{border-left-color:#fbbf24}.q-card.cat-art-literature{border-left-color:#f472b6}.q-card.cat-science{border-left-color:#4ade80}.q-card.cat-sports-leisure{border-left-color:#f87171}.q-card.cat-name-year{border-left-color:#fb923c}
 .q-extra{font-size:0.75rem;color:var(--muted);font-weight:600;margin-top:.25rem}
 .q-extra b{text-transform:uppercase;letter-spacing:.05em;font-size:.68rem}
 .empty{color:var(--muted);text-align:center;padding:2rem 1rem;font-weight:600}
@@ -137,6 +151,22 @@ label{display:block;font-size:0.75rem;font-weight:800;text-transform:uppercase;l
 }
 #cats .stat-value{font-size:1.25rem !important;line-height:1 !important}
 #cats .stat-label{font-size:.62rem !important;line-height:1.1 !important;white-space:nowrap !important;overflow:hidden !important;text-overflow:ellipsis !important;max-width:100%}
+/* Category colours on the top filter cards */
+#cats .cat-card.cat-geography{border-color:#38bdf8 !important;background:rgba(56,189,248,.14) !important}
+#cats .cat-card.cat-entertainment{border-color:#c084fc !important;background:rgba(192,132,252,.14) !important}
+#cats .cat-card.cat-history{border-color:#fbbf24 !important;background:rgba(251,191,36,.14) !important}
+#cats .cat-card.cat-art-literature{border-color:#f472b6 !important;background:rgba(244,114,182,.14) !important}
+#cats .cat-card.cat-science{border-color:#4ade80 !important;background:rgba(74,222,128,.14) !important}
+#cats .cat-card.cat-sports-leisure{border-color:#f87171 !important;background:rgba(248,113,113,.14) !important}
+#cats .cat-card.cat-name-year{border-color:#fb923c !important;background:rgba(251,146,60,.14) !important}
+#cats .cat-card.cat-other{border-color:var(--accent) !important;background:rgba(245,200,0,.12) !important}
+#cats .cat-card.cat-geography .stat-value,#cats .cat-card.cat-geography .stat-label{color:#38bdf8}
+#cats .cat-card.cat-entertainment .stat-value,#cats .cat-card.cat-entertainment .stat-label{color:#c084fc}
+#cats .cat-card.cat-history .stat-value,#cats .cat-card.cat-history .stat-label{color:#fbbf24}
+#cats .cat-card.cat-art-literature .stat-value,#cats .cat-card.cat-art-literature .stat-label{color:#f472b6}
+#cats .cat-card.cat-science .stat-value,#cats .cat-card.cat-science .stat-label{color:#4ade80}
+#cats .cat-card.cat-sports-leisure .stat-value,#cats .cat-card.cat-sports-leisure .stat-label{color:#f87171}
+#cats .cat-card.cat-name-year .stat-value,#cats .cat-card.cat-name-year .stat-label{color:#fb923c}
 .cat-card{cursor:pointer;transition:all .15s;user-select:none}
 .cat-card:hover{border-color:var(--accent);transform:translateY(-2px)}
 .cat-card.active{background:rgba(245,200,0,.14);border-color:var(--accent);box-shadow:0 0 0 1px var(--accent),0 4px 16px rgba(245,200,0,.25)}
@@ -153,6 +183,8 @@ label{display:block;font-size:0.75rem;font-weight:800;text-transform:uppercase;l
 .q-id{font-size:.68rem;color:var(--muted);font-weight:700}
 .q-info{font-size:.8rem;color:var(--muted);font-weight:600;margin-top:.3rem;white-space:pre-wrap}
 .q-text,.q-answer{white-space:pre-wrap}
+.q-answer.hidden{display:none}
+.answer-toggle{margin-left:auto}
 @media (max-width:520px){
   #cats.cat-grid > .stat-card,.cat-grid > .stat-card{flex-basis:112px !important;width:112px !important;min-width:112px !important;max-width:112px !important;height:66px !important;min-height:66px !important}
   #cats .stat-value{font-size:1.15rem !important}
@@ -188,7 +220,10 @@ label{display:block;font-size:0.75rem;font-weight:800;text-transform:uppercase;l
         <select id="fStatus"></select>
       </div>
 
-      <div class="section-title" id="listTitle">Questions</div>
+      <div class="section-title" style="display:flex;align-items:center;gap:.75rem">
+        <span id="listTitle">Questions</span>
+        <button class="secondary sm answer-toggle" id="answerToggle" type="button" aria-pressed="false">Show Answers</button>
+      </div>
       <div id="list"><div class="loading"><div class="spinner"></div>Loading…</div></div>
       <div style="height:3rem"></div>
     </div>
@@ -245,12 +280,26 @@ const DEFAULT_STATUSES = ['Draft', 'Ready', 'Used'];
 const SAVED_PASSWORD = 'dp3612';
 let pw = localStorage.getItem('cb_pw') || sessionStorage.getItem('cb_pw') || SAVED_PASSWORD;
 let headers = [], H = {}, categories = [], people = [], rows = [];
-let activeCat = '', busy = false;
+let activeCat = '', busy = false, showAnswers = false;
 
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const get = (r, name) => { const i = H[name.toLowerCase()]; return i === undefined ? '' : (r.values[i] || ''); };
 const has = name => H[name.toLowerCase()] !== undefined;
+
+function categoryKey(name) {
+  const c = String(name || '').trim().toLowerCase();
+  if (c.includes('geograph')) return 'geography';
+  if (c.includes('entertain')) return 'entertainment';
+  if (c.includes('history')) return 'history';
+  if (c.includes('art') || c.includes('literature')) return 'art-literature';
+  if (c.includes('science')) return 'science';
+  if (c.includes('sport') || c.includes('leisure')) return 'sports-leisure';
+  if (c.includes('name') && c.includes('year')) return 'name-year';
+  return 'other';
+}
+function categoryClass(name) { return 'cat-' + categoryKey(name); }
+
 
 /* ============ API ============ */
 async function api(action, payload = {}) {
@@ -340,7 +389,7 @@ function render() {
 
   $('cats').innerHTML =
     `<div class="stat-card cat-card ${!activeCat ? 'active' : ''}" data-cat=""><div class="stat-value">${rows.length}</div><div class="stat-label">All</div></div>` +
-    categories.map(c => `<div class="stat-card cat-card ${activeCat === c ? 'active' : ''}" data-cat="${esc(c)}"><div class="stat-value">${counts[c] || 0}</div><div class="stat-label">${esc(c)}</div></div>`).join('');
+    categories.map(c => `<div class="stat-card cat-card ${categoryClass(c)} ${activeCat === c ? 'active' : ''}" data-cat="${esc(c)}"><div class="stat-value">${counts[c] || 0}</div><div class="stat-label">${esc(c)}</div></div>`).join('');
 
   const fa = $('fAuthor').value, fs = $('fStatus').value;
   $('fAuthor').innerHTML = `<option value="">All Authors</option>` + people.map(p => `<option ${p === fa ? 'selected' : ''}>${esc(p)}</option>`).join('');
@@ -360,9 +409,12 @@ function render() {
     $('list').innerHTML = shown.slice().reverse().map(r => {
       const st = get(r, 'Status').trim(), pts = get(r, 'Points').trim(), rd = get(r, 'Round').trim(), qn = get(r, 'Question Number').trim();
       const meta = [get(r, 'Author') && '👤 ' + get(r, 'Author'), rd && 'Round ' + rd, qn && 'No. ' + qn, get(r, 'Last Edited') && 'Edited ' + get(r, 'Last Edited')].filter(Boolean);
-      return `<div class="q-card">
+      const cat = get(r, 'Category') || 'Uncategorised';
+      const qNum = qn ? `No. ${esc(qn)}` : '';
+      return `<div class="q-card ${categoryClass(cat)}">
         <div class="q-top">
-          <span class="q-cat">${esc(get(r, 'Category') || 'Uncategorised')}</span>
+          <span class="q-cat ${categoryClass(cat)}">${esc(cat)}</span>
+          ${qNum ? `<span class="q-number">${qNum}</span>` : ''}
           ${st ? `<span class="pill status-${esc(st.toLowerCase())}">${esc(st)}</span>` : ''}
           ${pts ? `<span class="pill pts">${esc(pts)} pt${pts === '1' ? '' : 's'}</span>` : ''}
           <span class="q-id">${esc(get(r, 'ID'))}</span>
@@ -372,7 +424,11 @@ function render() {
           </div>
         </div>
         <div class="q-text">${esc(get(r, 'Question'))}</div>
-        <div class="q-answer">${esc(get(r, 'Answer'))}</div>
+        <div class="q-answer-row">
+          <button class="secondary sm answer-reveal" type="button" data-answer-toggle="${r.row}" aria-expanded="${showAnswers ? 'true' : 'false'}">${showAnswers ? 'Hide Answer' : 'Show Answer'}</button>
+          <span class="q-answer-label ${showAnswers ? '' : 'hidden'}">Answer</span>
+          <div class="q-answer ${showAnswers ? '' : 'hidden'}" data-answer="${r.row}">${esc(get(r, 'Answer'))}</div>
+        </div>
         ${get(r, 'Extra Information') ? `<div class="q-info">${esc(get(r, 'Extra Information'))}</div>` : ''}
         ${meta.length ? `<div class="q-meta">${meta.map(esc).map(m => `<span>${m}</span>`).join('')}</div>` : ''}
       </div>`;
@@ -570,6 +626,18 @@ $('cats').addEventListener('click', e => {
 });
 
 $('list').addEventListener('click', async e => {
+  const ans = e.target.closest('[data-answer-toggle]');
+  if (ans) {
+    const card = ans.closest('.q-card');
+    const answer = card?.querySelector('[data-answer]');
+    const label = card?.querySelector('.q-answer-label');
+    const open = answer && answer.classList.contains('hidden');
+    answer?.classList.toggle('hidden', !open);
+    label?.classList.toggle('hidden', !open);
+    ans.textContent = open ? 'Hide Answer' : 'Show Answer';
+    ans.setAttribute('aria-expanded', open ? 'true' : 'false');
+    return;
+  }
   const ed = e.target.closest('[data-edit]'), del = e.target.closest('[data-del]');
   if (ed) { const r = rows.find(x => x.row == ed.dataset.edit); if (r) questionForm(r); }
   if (del) {
@@ -625,6 +693,12 @@ $('adminBack').onclick = () => {
 
 $('addQBtn').onclick = () => { if (headers.length) questionForm(null); };
 $('search').oninput = render; $('fAuthor').onchange = render; $('fStatus').onchange = render;
+$('answerToggle').onclick = () => {
+  showAnswers = !showAnswers;
+  $('answerToggle').textContent = showAnswers ? 'Hide All Answers' : 'Show All Answers';
+  $('answerToggle').setAttribute('aria-pressed', showAnswers ? 'true' : 'false');
+  render();
+};
 $('overlay').addEventListener('mousedown', e => { if (e.target === $('overlay') && pw) closeModal(); });
 
 /* ============ INIT ============ */
