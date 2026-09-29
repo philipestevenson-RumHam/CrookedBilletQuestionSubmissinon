@@ -19,7 +19,7 @@ body{
   color:var(--text);font-family:'Nunito','Segoe UI',system-ui,sans-serif;
   min-height:100vh;position:relative;
 }
-body::before{content:'';position:fixed;inset:0;background-color:#1a1400;pointer-events:none;z-index:0}
+body::before{content:'';position:fixed;inset:0;background:rgba(26,20,0,.96);pointer-events:none;z-index:0}
 #app{position:relative;z-index:1}
 
 header{
@@ -67,8 +67,8 @@ input::placeholder,textarea::placeholder{color:#5a4e28;font-weight:500}
 label{display:block;font-size:0.75rem;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-bottom:0.35rem}
 .field{margin-bottom:0.85rem}
 
-.q-card{background:var(--surface2);border:1px solid var(--border);border-left:5px solid var(--border);border-radius:12px;padding:.95rem 1rem;margin-bottom:.65rem;transition:all .15s}
-.q-card:hover{background:rgba(245,200,0,0.08);border-color:var(--accent)}
+.q-card{background:#241d00 !important;border:1px solid var(--border);border-left:5px solid var(--border);border-radius:12px;padding:.95rem 1rem;margin-bottom:.65rem;transition:all .15s}
+.q-card:hover{background:#241d00 !important;border-color:var(--accent)}
 .q-top{display:flex;align-items:center;gap:.5rem;margin-bottom:.55rem}
 .q-cat{font-size:.68rem;font-weight:900;text-transform:uppercase;letter-spacing:.06em;border-radius:99px;padding:.18rem .65rem;border:1px solid currentColor}
 .q-number{font-size:.7rem;font-weight:800;color:var(--muted);white-space:nowrap}
@@ -194,7 +194,7 @@ label{display:block;font-size:0.75rem;font-weight:800;text-transform:uppercase;l
   .category-picker{flex-direction:row}
 }
 
-.host-round-title{display:flex;align-items:center;gap:.65rem;margin:1rem 0 .75rem;font-size:1.05rem;font-weight:800}.host-question{position:relative;margin-bottom:.8rem;padding:1rem 1.1rem;border:1px solid var(--border);border-left:5px solid var(--accent);border-radius:12px;background:var(--card);box-shadow:0 2px 8px rgba(0,0,0,.04)}.host-q-top{display:flex;align-items:center;gap:.55rem;flex-wrap:wrap;margin-bottom:.45rem}.host-q-num{font-weight:800;font-size:.8rem;color:var(--muted)}.host-q-text{font-size:1.02rem;font-weight:700;line-height:1.45}.host-answer{margin-top:.7rem;padding-top:.7rem;border-top:1px dashed var(--border);font-weight:650}.host-answer.hidden{display:none}.round-tab{cursor:pointer}.round-tab.active{outline:3px solid rgba(0,0,0,.12);transform:translateY(-1px)}
+.host-round-title{display:flex;align-items:center;gap:.65rem;margin:1rem 0 .75rem;font-size:1.05rem;font-weight:800}.host-question{position:relative;margin-bottom:.8rem;padding:1rem 1.1rem;border:1px solid var(--border);border-left:5px solid var(--accent);border-radius:12px;background:#221c00 !important;box-shadow:0 2px 8px rgba(0,0,0,.04)}.host-q-top{display:flex;align-items:center;gap:.55rem;flex-wrap:wrap;margin-bottom:.45rem}.host-q-num{font-weight:800;font-size:.8rem;color:var(--muted)}.host-q-text{font-size:1.02rem;font-weight:700;line-height:1.45}.host-answer{margin-top:.7rem;padding-top:.7rem;border-top:1px dashed var(--border);font-weight:650}.host-answer.hidden{display:none}.round-tab{cursor:pointer}.round-tab.active{outline:3px solid rgba(0,0,0,.12);transform:translateY(-1px)}
 </style>
 </head>
 <body>
@@ -206,7 +206,7 @@ label{display:block;font-size:0.75rem;font-weight:800;text-transform:uppercase;l
       <div class="subtitle">Crooked Billet</div>
     </div>
     <span id="conn" class="badge badge-err" style="margin-left:auto">🔒 Locked</span>
-    <div style="display:flex;gap:.45rem;margin-left:auto"><button class="secondary sm" id="hostBtn">🎤 Host View</button><button class="secondary sm" id="adminBtn">⚙ Admin</button></div>
+    <div style="display:flex;gap:.45rem;margin-left:auto"><button class="secondary sm" id="questionBankBtn">📚 Question Bank</button><button class="secondary sm" id="hostBtn">🎤 Host View</button><button class="secondary sm" id="adminBtn">⚙ Admin</button></div>
   </header>
   <div class="container">
     <div id="mainView">
@@ -236,7 +236,7 @@ label{display:block;font-size:0.75rem;font-weight:800;text-transform:uppercase;l
           <div class="section-title" style="margin:0">Host View</div>
           <div id="hostSummary" class="q-extra" style="margin-top:.25rem"></div>
         </div>
-        <button class="secondary sm" id="hostBack">← Back to questions</button>
+        <button class="secondary sm" id="hostBack">← Question Bank</button>
       </div>
       <div id="roundTabs" class="cat-grid" style="margin-bottom:1.2rem"></div>
       <div id="hostQuestions"></div>
@@ -457,7 +457,9 @@ function render() {
 }
 
 function renderHostView() {
-  const roundValues = rows.map(roundValue).filter(Boolean);
+  // Host View is intentionally restricted to questions marked Ready.
+  const readyRows = rows.filter(r => get(r, 'Status').trim().toLowerCase() === 'ready');
+  const roundValues = readyRows.map(roundValue).filter(Boolean);
   const rounds = [...new Set(roundValues)].sort((a,b) => {
     const na = Number(a), nb = Number(b);
     if (Number.isFinite(na) && Number.isFinite(nb)) return na - nb;
@@ -467,17 +469,17 @@ function renderHostView() {
   });
 
   if (!activeRound || !rounds.includes(activeRound)) activeRound = rounds[0] || '';
-  $('hostSummary').textContent = rounds.length
-    ? `${rounds.length} round${rounds.length === 1 ? '' : 's'} · ${rows.length} questions`
-    : 'No rounds found';
+  $('hostSummary').textContent = readyRows.length
+    ? `${readyRows.length} ready question${readyRows.length === 1 ? '' : 's'} · ${rounds.length} round${rounds.length === 1 ? '' : 's'}`
+    : 'No questions marked Ready';
 
   $('roundTabs').innerHTML = rounds.length ? rounds.map(rd => {
-    const count = rows.filter(r => roundValue(r) === rd).length;
+    const count = readyRows.filter(r => roundValue(r) === rd).length;
     const roundLabel = /^\d+$/.test(String(rd)) ? String(rd).padStart(2, '0') : String(rd);
-      return `<button class="cat-card round-tab ${rd === activeRound ? 'active' : ''}" data-round="${esc(rd)}"><span class="cat-name">Round ${esc(roundLabel)} </span><span class="cat-count">(${count} questions)</span></button>`;
+    return `<button class="cat-card round-tab ${rd === activeRound ? 'active' : ''}" data-round="${esc(rd)}"><span class="cat-name">Round ${esc(roundLabel)} </span><span class="cat-count">(${count} questions)</span></button>`;
   }).join('') : '';
 
-  const shown = rows.filter(r => roundValue(r) === activeRound).slice().sort((a,b) => {
+  const shown = readyRows.filter(r => roundValue(r) === activeRound).slice().sort((a,b) => {
     const qa = questionNumberValue(a), qb = questionNumberValue(b);
     const na = Number(qa), nb = Number(qb);
     if (Number.isFinite(na) && Number.isFinite(nb)) return na - nb;
@@ -487,9 +489,9 @@ function renderHostView() {
   });
 
   if (!shown.length) {
-    $('hostQuestions').innerHTML = rounds.length
+    $('hostQuestions').innerHTML = readyRows.length
       ? '<div class="empty">No questions found in this round.</div>'
-      : '<div class="empty">No rounds found. Check that your spreadsheet has a Round column with values.</div>';
+      : '<div class="empty">No questions are marked Ready yet.</div>';
     return;
   }
 
@@ -750,6 +752,11 @@ $('importFile').onchange = e => {
 };
 $('clearBtn').onclick = clearAllFlow;
 
+$('questionBankBtn').onclick = () => {
+  $('hostView').style.display = 'none';
+  $('adminView').style.display = 'none';
+  $('mainView').style.display = '';
+};
 $('hostBtn').onclick = () => {
   $('mainView').style.display = 'none'; $('adminView').style.display = 'none'; $('hostView').style.display = '';
   renderHostView();
