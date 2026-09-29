@@ -2,12 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
-<meta name="apple-mobile-web-app-capable" content="yes"/>
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-<meta name="apple-mobile-web-app-title" content="Crooked Billet"/>
-<meta name="mobile-web-app-capable" content="yes"/>
-<meta name="theme-color" content="#1a1400"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Crooked Billet – Quiz Question Bank</title>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
 <style>
@@ -200,15 +195,9 @@ label{display:block;font-size:0.75rem;font-weight:800;text-transform:uppercase;l
 }
 
 .host-round-title{display:flex;align-items:center;gap:.65rem;margin:1rem 0 .75rem;font-size:1.05rem;font-weight:800}.host-question{position:relative;margin-bottom:.8rem;padding:1rem 1.1rem;border:1px solid var(--border);border-left:5px solid var(--accent);border-radius:12px;background:#221c00 !important;box-shadow:0 2px 8px rgba(0,0,0,.04)}.host-q-top{display:flex;align-items:center;gap:.55rem;flex-wrap:wrap;margin-bottom:.45rem}.host-q-num{font-weight:800;font-size:.8rem;color:var(--muted)}.host-q-text{font-size:1.02rem;font-weight:700;line-height:1.45}.host-answer{margin-top:.7rem;padding-top:.7rem;border-top:1px dashed var(--border);font-weight:650}.host-answer.hidden{display:none}.round-tab{cursor:pointer}.round-tab.active{outline:3px solid rgba(0,0,0,.12);transform:translateY(-1px)}
-.pwa-spacer{display:none}
-@media (display-mode: standalone), (display-mode: fullscreen){
-  body{min-height:100dvh}
-}
  .host-slideshow{position:fixed;inset:0;z-index:9999;display:none;background:#0f0d00;overflow:hidden}
 .host-slideshow.open{display:block}
-.host-slideshow:fullscreen{width:100%;height:100%;}
-.host-slideshow:fullscreen .host-slide{width:100%;height:100%;min-height:0;}
-.host-slide{width:100vw;height:100dvh;min-height:0;display:flex;flex-direction:column;position:relative;padding:2vh 3vw max(2.2vh, env(safe-area-inset-bottom)) 3vw;background:#1a1602;overflow:hidden;color:var(--text);box-sizing:border-box}
+.host-slide{width:100vw;height:100vh;display:flex;flex-direction:column;position:relative;padding:2vh 3vw 1.4vh;background:#1a1602;overflow:hidden;color:var(--text)}
 .host-slide-top{flex:0 0 auto;display:flex;align-items:center;gap:.65rem;flex-wrap:wrap;margin-bottom:1.25vh;padding:0 8.5rem .95vh 0;border-bottom:1px solid rgba(245,200,0,.16);min-height:5.5vh}
 .host-slide-top span{display:inline-flex;align-items:center;gap:.35rem;min-height:2.1rem}
 .host-slide-top .q-cat{font-size:clamp(.85rem,1.1vw,1.15rem);padding:.3rem .75rem}
@@ -233,10 +222,10 @@ label{display:block;font-size:0.75rem;font-weight:800;text-transform:uppercase;l
 .host-slide-answer,.host-slide-extra{width:100%;height:100%;display:flex;align-items:center;justify-content:center;text-align:center;font-size:2rem;line-height:1.18;font-weight:800;white-space:pre-wrap;overflow:hidden;overflow-wrap:anywhere;text-wrap:balance}
 .host-slide-answer{color:#c4f5d5}.host-slide-extra{font-weight:700;color:#f4dda6}
 .host-slide-answer.hidden,.host-slide-extra.hidden,.host-slide-answer-panel.hidden,.host-slide-extra-panel.hidden{display:none}
-.host-slide-controls{flex:0 0 auto;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:1rem;margin-top:.8vh;padding-top:.8vh;padding-bottom:.2rem;border-top:1px solid rgba(245,200,0,.16);min-height:3.4rem;box-sizing:border-box}
+.host-slide-controls{flex:0 0 auto;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:1rem;margin-top:1.25vh;padding-top:1vh;border-top:1px solid rgba(245,200,0,.16)}
 .host-slide-controls .group{display:flex;align-items:center;gap:.5rem}.host-slide-controls .group:last-child{justify-content:flex-end}
 .host-slide-counter{font-size:clamp(.82rem,1vw,1rem);font-weight:900;color:#dfd49e;min-width:9rem;text-align:center;letter-spacing:.02em}
-.host-slide-controls button{font-size:clamp(.9rem,1.05vw,1.1rem);padding:.62rem 1rem;border-radius:10px;min-height:2.8rem;box-sizing:border-box}
+.host-slide-controls button{font-size:clamp(.9rem,1.05vw,1.1rem);padding:.68rem 1rem;border-radius:10px}
 #hostShowSlideAnswer{background:#2b2605;border-color:rgba(245,200,0,.42);color:#f6db73;font-weight:900}
 #hostShowSlideAnswer[aria-expanded="true"]{background:rgba(74,222,128,.14);border-color:rgba(74,222,128,.45);color:#b8f7d0}
 #hostNext:not(:disabled){background:var(--accent);border-color:var(--accent);color:#201900}
@@ -270,7 +259,7 @@ label{display:block;font-size:0.75rem;font-weight:800;text-transform:uppercase;l
   .host-slideshow{background:#0e0c00}
   .host-slide{
     width:100dvw;height:100dvh;min-height:100dvh;
-    padding:max(1.5vh,env(safe-area-inset-top)) max(2.5vw,env(safe-area-inset-left)) max(2.4vh,calc(env(safe-area-inset-bottom) + .35rem)) max(2.5vw,env(safe-area-inset-right));
+    padding:max(1.5vh,env(safe-area-inset-top)) max(2.5vw,env(safe-area-inset-left)) max(1.2vh,env(safe-area-inset-bottom)) max(2.5vw,env(safe-area-inset-right));
   }
   .host-slide-top-actions{right:max(.65rem,env(safe-area-inset-right));top:max(.55rem,env(safe-area-inset-top));gap:.35rem}
   .host-slide-top-actions button{padding:.5rem .65rem;min-height:2.35rem;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
@@ -283,7 +272,7 @@ label{display:block;font-size:0.75rem;font-weight:800;text-transform:uppercase;l
   .host-slide-panel-content{padding:.3rem 3vw 1rem}
   .host-slide-question{line-height:1.04}
   .host-slide-answer,.host-slide-extra{line-height:1.12}
-  .host-slide-controls{grid-template-columns:1fr auto 1fr;gap:.35rem;margin-top:.65vh;padding-top:.65vh;padding-bottom:.15rem;min-height:3.05rem}
+  .host-slide-controls{grid-template-columns:1fr auto 1fr;gap:.35rem;margin-top:1vh;padding-top:.8vh}
   .host-slide-controls .group{gap:.3rem}
   .host-slide-controls button{padding:.62rem .7rem;min-height:2.7rem;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
   .host-slide-counter{min-width:5rem;font-size:.74rem}
@@ -316,10 +305,10 @@ label{display:block;font-size:0.75rem;font-weight:800;text-transform:uppercase;l
   .host-contents-rounds{flex-basis:18vh;height:18vh;max-height:18vh}
 }
 @media (max-width:700px) and (orientation:landscape){
-  .host-slide{padding-top:max(1vh,env(safe-area-inset-top));padding-bottom:max(2vh,calc(env(safe-area-inset-bottom) + .25rem))}
+  .host-slide{padding-top:max(1vh,env(safe-area-inset-top));padding-bottom:max(.8vh,env(safe-area-inset-bottom))}
   .host-slide-top{min-height:4.5vh;margin-bottom:.65vh}
-  .host-slide-controls{margin-top:.55vh;padding-top:.55vh;padding-bottom:.15rem;min-height:2.95rem}
-  .host-slide-controls button{min-height:2.6rem;padding:.5rem .7rem}
+  .host-slide-controls{margin-top:.7vh;padding-top:.6vh}
+  .host-slide-controls button{min-height:2.45rem;padding:.5rem .7rem}
 }
 @media (max-width:380px){
   header{padding:.6rem .7rem}
@@ -775,23 +764,12 @@ function openHostSlideAt(index) {
   renderHostSlide();
 }
 
-async function enterHostSlideshow() {
-  const fsEl = $('hostSlideshow');
-  fsEl.classList.add('open');
-  fsEl.setAttribute('aria-hidden', 'false');
+function enterHostSlideshow() {
+  $('hostSlideshow').classList.add('open');
+  $('hostSlideshow').setAttribute('aria-hidden', 'false');
   document.body.style.overflow = 'hidden';
   showHostContents();
-
-  // Request fullscreen on the slideshow itself so iPad/Safari does not require a second manual fullscreen step.
-  try {
-    if (fsEl.requestFullscreen) {
-      await fsEl.requestFullscreen({ navigationUI: 'hide' });
-    } else if (document.documentElement.requestFullscreen) {
-      await document.documentElement.requestFullscreen({ navigationUI: 'hide' });
-    }
-  } catch (e) {
-    // Fullscreen can be unavailable in some embedded/windowed iPad contexts; the slideshow still opens normally.
-  }
+  if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(() => {});
 }
 
 function exitHostSlideshow() {
