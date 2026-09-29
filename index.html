@@ -74,15 +74,31 @@ label{display:block;font-size:0.75rem;font-weight:800;text-transform:uppercase;l
 
 .q-card{background:#241d00 !important;border:1px solid var(--border);border-left:5px solid var(--border);border-radius:12px;padding:.95rem 1rem;margin-bottom:.65rem;transition:all .15s}
 .q-card:hover{background:#241d00 !important;border-color:var(--accent)}
-.q-top{display:flex;align-items:center;gap:.5rem;margin-bottom:.55rem}
-.q-cat{font-size:.68rem;font-weight:900;text-transform:uppercase;letter-spacing:.06em;border-radius:99px;padding:.18rem .65rem;border:1px solid currentColor}
+.q-top{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:start;gap:.75rem;margin-bottom:.7rem}
+.q-top-left{display:flex;align-items:center;gap:.45rem .5rem;flex-wrap:wrap;min-width:0}
+.q-cat{font-size:.68rem;font-weight:900;text-transform:uppercase;letter-spacing:.06em;border-radius:99px;padding:.2rem .7rem;border:1px solid currentColor;white-space:nowrap}
 .q-number{font-size:.7rem;font-weight:800;color:var(--muted);white-space:nowrap}
-.q-actions{margin-left:auto;display:flex;gap:.4rem}
-.q-text{font-size:1rem;font-weight:800;color:var(--text);line-height:1.5;margin:.15rem 0 .55rem}
-.q-answer-row{display:flex;align-items:center;gap:.55rem;margin-top:.25rem}
-.q-answer{font-weight:900;margin-top:0;line-height:1.4}
-.q-answer-label{font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:900}
-.answer-reveal{min-width:108px}
+.q-actions{display:flex;gap:.4rem;flex:0 0 auto}
+.q-text{font-size:1rem;font-weight:800;color:var(--text);line-height:1.55;margin:.05rem 0 .8rem;padding-right:.1rem}
+.q-answer-row{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:start;gap:.65rem;padding:.7rem .75rem;margin-top:.1rem;border:1px solid rgba(74,60,0,.72);border-radius:10px;background:rgba(26,20,0,.42)}
+.q-answer-content{min-width:0}
+.q-answer{font-weight:900;margin-top:.18rem;line-height:1.45;min-width:0;color:#d7f5df}
+.q-answer-label{display:block;font-size:.62rem;text-transform:uppercase;letter-spacing:.09em;color:var(--green);font-weight:900;line-height:1.2}
+.answer-reveal{min-width:108px;align-self:start}
+.answer-reveal.standalone{grid-column:1/-1}
+.q-meta{font-size:.7rem;color:var(--muted);font-weight:700;margin-top:.65rem;padding-top:.55rem;border-top:1px solid rgba(74,60,0,.45);display:flex;flex-wrap:wrap;gap:.3rem .75rem}
+.q-meta span{white-space:nowrap}
+.q-info{font-size:.78rem;color:#efd38a;font-weight:650;line-height:1.45;white-space:pre-wrap;margin-top:.6rem;padding:.7rem .75rem;border:1px solid rgba(251,191,36,.18);border-radius:10px;background:rgba(251,191,36,.055)}
+.q-info-label{display:block;font-size:.62rem;text-transform:uppercase;letter-spacing:.09em;font-weight:900;color:#fbbf24;margin-bottom:.22rem;line-height:1.2}
+@media (max-width:700px){
+  .q-top{grid-template-columns:1fr;gap:.55rem}
+  .q-actions{justify-content:flex-start}
+  .q-text{font-size:.98rem;line-height:1.5}
+  .q-answer-row{grid-template-columns:1fr}
+  .answer-reveal{width:100%;min-width:0}
+  .answer-reveal.standalone{grid-column:auto}
+  .q-meta{gap:.3rem .6rem}
+}
 .hidden{display:none!important}
 .cat-geography{color:#38bdf8;background:rgba(56,189,248,.12)}
 .cat-entertainment{color:#c084fc;background:rgba(192,132,252,.12)}
@@ -208,6 +224,8 @@ label{display:block;font-size:0.75rem;font-weight:800;text-transform:uppercase;l
 .host-slideshow.open{display:block}
 .host-slideshow:fullscreen{width:100%;height:100%;}
 .host-slideshow:fullscreen .host-slide{width:100%;height:100%;min-height:0;}
+.host-slide-progress{flex:0 0 4px;width:100%;margin:.25vh 0 .55vh;background:rgba(245,200,0,.10);border-radius:99px;overflow:hidden}
+.host-slide-progress span{display:block;width:0;height:100%;background:linear-gradient(90deg,#d4ac00,var(--accent));border-radius:99px;transition:width .2s ease}
 .host-slide{width:100vw;height:100dvh;min-height:0;display:flex;flex-direction:column;position:relative;padding:2vh 3vw max(2.2vh, env(safe-area-inset-bottom)) 3vw;background:#1a1602;overflow:hidden;color:var(--text);box-sizing:border-box}
 .host-slide-top{flex:0 0 auto;display:flex;align-items:center;gap:.65rem;flex-wrap:wrap;margin-bottom:1.25vh;padding:0 8.5rem .95vh 0;border-bottom:1px solid rgba(245,200,0,.16);min-height:5.5vh}
 .host-slide-top span{display:inline-flex;align-items:center;gap:.35rem;min-height:2.1rem}
@@ -233,10 +251,11 @@ label{display:block;font-size:0.75rem;font-weight:800;text-transform:uppercase;l
 .host-slide-answer,.host-slide-extra{width:100%;height:100%;display:flex;align-items:center;justify-content:center;text-align:center;font-size:2rem;line-height:1.18;font-weight:800;white-space:pre-wrap;overflow:hidden;overflow-wrap:anywhere;text-wrap:balance}
 .host-slide-answer{color:#c4f5d5}.host-slide-extra{font-weight:700;color:#f4dda6}
 .host-slide-answer.hidden,.host-slide-extra.hidden,.host-slide-answer-panel.hidden,.host-slide-extra-panel.hidden{display:none}
-.host-slide-controls{flex:0 0 auto;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:1rem;margin-top:.8vh;padding-top:.8vh;padding-bottom:.2rem;border-top:1px solid rgba(245,200,0,.16);min-height:3.4rem;box-sizing:border-box}
-.host-slide-controls .group{display:flex;align-items:center;gap:.5rem}.host-slide-controls .group:last-child{justify-content:flex-end}
+.host-slide-controls{flex:0 0 auto;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:1rem;margin-top:.35vh;padding-top:.8vh;padding-bottom:.2rem;border-top:1px solid rgba(245,200,0,.16);min-height:3.4rem;box-sizing:border-box}
+.host-slide-controls .group{display:flex;align-items:center;gap:.5rem}.host-slide-nav-right{justify-content:flex-end}.host-slide-controls-center{display:flex;align-items:center;justify-content:center;gap:.75rem}
 .host-slide-counter{font-size:clamp(.82rem,1vw,1rem);font-weight:900;color:#dfd49e;min-width:9rem;text-align:center;letter-spacing:.02em}
 .host-slide-controls button{font-size:clamp(.9rem,1.05vw,1.1rem);padding:.62rem 1rem;border-radius:10px;min-height:2.8rem;box-sizing:border-box}
+#hostNext{font-weight:900;min-width:8rem;box-shadow:0 4px 16px rgba(245,200,0,.18)}
 #hostShowSlideAnswer{background:#2b2605;border-color:rgba(245,200,0,.42);color:#f6db73;font-weight:900}
 #hostShowSlideAnswer[aria-expanded="true"]{background:rgba(74,222,128,.14);border-color:rgba(74,222,128,.45);color:#b8f7d0}
 #hostNext:not(:disabled){background:var(--accent);border-color:var(--accent);color:#201900}
@@ -283,10 +302,13 @@ label{display:block;font-size:0.75rem;font-weight:800;text-transform:uppercase;l
   .host-slide-panel-content{padding:.3rem 3vw 1rem}
   .host-slide-question{line-height:1.04}
   .host-slide-answer,.host-slide-extra{line-height:1.12}
-  .host-slide-controls{grid-template-columns:1fr auto 1fr;gap:.35rem;margin-top:.65vh;padding-top:.65vh;padding-bottom:.15rem;min-height:3.05rem}
+  .host-slide-progress{flex-basis:4px;margin:.2vh 0 .45vh}
+  .host-slide-controls{grid-template-columns:1fr auto 1fr;gap:.35rem;margin-top:.45vh;padding-top:.65vh;padding-bottom:.15rem;min-height:3.05rem}
   .host-slide-controls .group{gap:.3rem}
+  .host-slide-controls-center{gap:.4rem}
   .host-slide-controls button{padding:.62rem .7rem;min-height:2.7rem;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
   .host-slide-counter{min-width:5rem;font-size:.74rem}
+  #hostNext{min-width:6.4rem}
   .host-contents{width:100dvw;height:100dvh;min-height:100dvh;padding:max(3vh,env(safe-area-inset-top)) max(4vw,env(safe-area-inset-left)) max(2vh,env(safe-area-inset-bottom)) max(4vw,env(safe-area-inset-right))}
   .host-contents-title{font-size:clamp(1.35rem,7vw,2rem)}
   .host-contents-subtitle{font-size:.82rem;margin-bottom:1.5vh}
@@ -329,12 +351,13 @@ label{display:block;font-size:0.75rem;font-weight:800;text-transform:uppercase;l
   .host-slide-top span{min-height:1.9rem}
   .host-slide-body.two{grid-template-rows:minmax(0,5.8fr) minmax(0,4.2fr)}
   .host-slide-body.three{grid-template-rows:minmax(0,5.8fr) minmax(0,2.7fr) minmax(0,1.5fr)}
-  .host-slide-controls{grid-template-columns:1fr 1fr;grid-template-areas:'nav nav' 'counter answer';align-items:center}
-  .host-slide-controls .group:first-child{grid-area:nav;justify-content:space-between;width:100%}
-  .host-slide-controls .group:last-child{grid-area:answer;justify-content:flex-end}
+  .host-slide-controls{grid-template-columns:1fr 1fr;grid-template-areas:'nav-left nav-right' 'counter answer';align-items:center}
+  .host-slide-nav-left{grid-area:nav-left}
+  .host-slide-nav-right{grid-area:nav-right;justify-content:flex-end}
+  .host-slide-controls-center{display:contents}
   .host-slide-counter{grid-area:counter;min-width:0;text-align:left}
-  .host-slide-controls .group:first-child button,.host-slide-controls .group:last-child button{flex:1}
-  .host-slide-controls .group:first-child button + button{margin-left:.25rem}
+  .host-slide-controls-center #hostShowSlideAnswer{grid-area:answer;justify-self:end}
+  .host-slide-nav-left button,.host-slide-nav-right button{width:100%}
   .host-slide-panel-label{min-height:2.05rem;padding:.48rem .75rem .25rem}
   .host-slide-panel-content{padding:.2rem 4vw .8rem}
   .host-contents-rounds{flex-basis:18vh;height:18vh;max-height:18vh}
@@ -342,7 +365,8 @@ label{display:block;font-size:0.75rem;font-weight:800;text-transform:uppercase;l
 @media (max-width:700px) and (orientation:landscape){
   .host-slide{padding-top:max(1vh,env(safe-area-inset-top));padding-bottom:max(2vh,calc(env(safe-area-inset-bottom) + .25rem))}
   .host-slide-top{min-height:4.5vh;margin-bottom:.65vh}
-  .host-slide-controls{margin-top:.55vh;padding-top:.55vh;padding-bottom:.15rem;min-height:2.95rem}
+  .host-slide-progress{flex-basis:3px;margin:.15vh 0 .4vh}
+  .host-slide-controls{margin-top:.4vh;padding-top:.55vh;padding-bottom:.15rem;min-height:2.95rem}
   .host-slide-controls button{min-height:2.6rem;padding:.5rem .7rem}
 }
 @media (max-width:380px){
@@ -439,14 +463,17 @@ label{display:block;font-size:0.75rem;font-weight:800;text-transform:uppercase;l
             <div class="host-slide-panel-content"><div id="hostSlideExtra" class="host-slide-extra hidden"></div></div>
           </div>
         </div>
+        <div class="host-slide-progress" role="progressbar" aria-label="Quiz progress" aria-valuemin="1" aria-valuemax="1" aria-valuenow="1"><span id="hostSlideProgress"></span></div>
         <div class="host-slide-controls">
-          <div class="group">
+          <div class="group host-slide-nav-left">
             <button class="secondary" id="hostPrev" type="button">← Previous</button>
-            <button class="secondary" id="hostNext" type="button">Next →</button>
           </div>
-          <div id="hostSlideCounter" class="host-slide-counter">Question 1 of 1</div>
-          <div class="group">
+          <div class="host-slide-controls-center">
+            <div id="hostSlideCounter" class="host-slide-counter" aria-live="polite">Question 1 of 1</div>
             <button class="secondary" id="hostShowSlideAnswer" type="button" aria-expanded="false">Show Answer</button>
+          </div>
+          <div class="group host-slide-nav-right">
+            <button class="secondary" id="hostNext" type="button">Next →</button>
           </div>
         </div>
       </div>
@@ -639,13 +666,16 @@ function render() {
       const meta = [get(r, 'Author') && '👤 ' + get(r, 'Author'), rd && 'Round ' + rd, qn && 'No. ' + qn, get(r, 'Last Edited') && 'Edited ' + get(r, 'Last Edited')].filter(Boolean);
       const cat = get(r, 'Category') || 'Uncategorised';
       const qNum = qn ? `No. ${esc(qn)}` : '';
+      const author = get(r, 'Author').trim();
+      const lastEdited = get(r, 'Last Edited').trim();
       return `<div class="q-card ${categoryClass(cat)}">
         <div class="q-top">
-          <span class="q-cat ${categoryClass(cat)}">${esc(cat)}</span>
-          ${qNum ? `<span class="q-number">${qNum}</span>` : ''}
-          ${st ? `<span class="pill status-${esc(st.toLowerCase())}">${esc(st)}</span>` : ''}
-          ${pts ? `<span class="pill pts">${esc(pts)} pt${pts === '1' ? '' : 's'}</span>` : ''}
-          <span class="q-id">${esc(get(r, 'ID'))}</span>
+          <div class="q-top-left">
+            <span class="q-cat ${categoryClass(cat)}">${esc(cat)}</span>
+            ${qNum ? `<span class="q-number">${qNum}</span>` : ''}
+            ${st ? `<span class="pill status-${esc(st.toLowerCase())}">${esc(st)}</span>` : ''}
+            ${pts ? `<span class="pill pts">${esc(pts)} pt${pts === '1' ? '' : 's'}</span>` : ''}
+          </div>
           <div class="q-actions">
             <button class="secondary sm" data-edit="${r.row}">Edit</button>
             <button class="danger sm" data-del="${r.row}">Delete</button>
@@ -653,12 +683,19 @@ function render() {
         </div>
         <div class="q-text">${esc(get(r, 'Question'))}</div>
         <div class="q-answer-row">
-          <button class="secondary sm answer-reveal" type="button" data-answer-toggle="${r.row}" aria-expanded="${showAnswers ? 'true' : 'false'}">${showAnswers ? 'Hide Answer' : 'Show Answer'}</button>
-          <span class="q-answer-label ${showAnswers ? '' : 'hidden'}">Answer</span>
-          <div class="q-answer ${showAnswers ? '' : 'hidden'}" data-answer="${r.row}">${esc(get(r, 'Answer'))}</div>
+          <button class="secondary sm answer-reveal ${showAnswers ? '' : 'standalone'}" type="button" data-answer-toggle="${r.row}" aria-expanded="${showAnswers ? 'true' : 'false'}">${showAnswers ? 'Hide Answer' : 'Show Answer'}</button>
+          <div class="q-answer-content ${showAnswers ? '' : 'hidden'}">
+            <span class="q-answer-label">Answer</span>
+            <div class="q-answer" data-answer="${r.row}">${esc(get(r, 'Answer'))}</div>
+          </div>
         </div>
-        ${get(r, 'Extra Information') ? `<div class="q-info">${esc(get(r, 'Extra Information'))}</div>` : ''}
-        ${meta.length ? `<div class="q-meta">${meta.map(esc).map(m => `<span>${m}</span>`).join('')}</div>` : ''}
+        ${get(r, 'Extra Information') ? `<div class="q-info"><span class="q-info-label">Extra Information</span>${esc(get(r, 'Extra Information'))}</div>` : ''}
+        <div class="q-meta">
+          ${author ? `<span>👤 ${esc(author)}</span>` : ''}
+          ${rd ? `<span>Round ${esc(rd)}</span>` : ''}
+          ${lastEdited ? `<span>Edited ${esc(lastEdited)}</span>` : ''}
+          ${get(r, 'ID') ? `<span>ID ${esc(get(r, 'ID'))}</span>` : ''}
+        </div>
       </div>`;
     }).join('');
   }
@@ -881,7 +918,11 @@ function renderHostSlide() {
   $('hostSlideExtra').classList.toggle('hidden', !(show && hasExtra));
   $('hostShowSlideAnswer').textContent = show ? 'Hide Answer' : 'Show Answer';
   $('hostShowSlideAnswer').setAttribute('aria-expanded', show ? 'true' : 'false');
+  const progressPct = hostSlideRows.length ? ((hostSlideIndex + 1) / hostSlideRows.length) * 100 : 0;
   $('hostSlideCounter').textContent = `Question ${hostSlideIndex + 1} of ${hostSlideRows.length}`;
+  $('hostSlideProgress').style.width = progressPct + '%';
+  $('hostSlideProgress').setAttribute('aria-valuemax', String(hostSlideRows.length));
+  $('hostSlideProgress').setAttribute('aria-valuenow', String(hostSlideIndex + 1));
   $('hostPrev').disabled = hostSlideIndex === 0;
   $('hostNext').disabled = hostSlideIndex === hostSlideRows.length - 1;
   requestAnimationFrame(() => requestAnimationFrame(fitHostSlideText));
