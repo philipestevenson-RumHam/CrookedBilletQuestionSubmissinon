@@ -195,6 +195,49 @@ label{display:block;font-size:0.75rem;font-weight:800;text-transform:uppercase;l
 }
 
 .host-round-title{display:flex;align-items:center;gap:.65rem;margin:1rem 0 .75rem;font-size:1.05rem;font-weight:800}.host-question{position:relative;margin-bottom:.8rem;padding:1rem 1.1rem;border:1px solid var(--border);border-left:5px solid var(--accent);border-radius:12px;background:#221c00 !important;box-shadow:0 2px 8px rgba(0,0,0,.04)}.host-q-top{display:flex;align-items:center;gap:.55rem;flex-wrap:wrap;margin-bottom:.45rem}.host-q-num{font-weight:800;font-size:.8rem;color:var(--muted)}.host-q-text{font-size:1.02rem;font-weight:700;line-height:1.45}.host-answer{margin-top:.7rem;padding-top:.7rem;border-top:1px dashed var(--border);font-weight:650}.host-answer.hidden{display:none}.round-tab{cursor:pointer}.round-tab.active{outline:3px solid rgba(0,0,0,.12);transform:translateY(-1px)}
+ .host-slideshow{position:fixed;inset:0;z-index:9999;display:none;background:#120f00;overflow:hidden}
+.host-slideshow.open{display:block}
+.host-slide{width:100vw;height:100vh;display:flex;flex-direction:column;position:relative;padding:2.2vh 3vw 1.8vh;background:#221c00;overflow:hidden}
+.host-slide-top{flex:0 0 auto;display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;margin-bottom:1.5vh;padding-right:7.5rem}
+.host-slide-top .q-cat{font-size:clamp(.9rem,1.2vw,1.25rem);padding:.28rem .75rem}
+.host-slide-meta{font-size:clamp(.85rem,1.1vw,1.15rem);font-weight:800;color:var(--muted);padding:.25rem .1rem}
+.host-slide-author{font-size:clamp(.85rem,1.1vw,1.15rem);font-weight:800;color:var(--text);padding:.25rem .1rem}
+.host-slide-round{font-size:clamp(.85rem,1.1vw,1.15rem);font-weight:800;color:var(--muted);padding:.25rem .1rem}
+.host-slide-top-actions{position:absolute;right:1rem;top:1rem;display:flex;align-items:center;gap:.45rem;z-index:2}
+.host-slide-body{flex:1 1 auto;min-height:0;display:grid;gap:1.2vh;overflow:hidden}
+.host-slide-body.question-only{grid-template-rows:minmax(0,1fr)}
+.host-slide-body.two{grid-template-rows:minmax(0,6fr) minmax(0,4fr)}
+.host-slide-body.three{grid-template-rows:minmax(0,6fr) minmax(0,2.5fr) minmax(0,1.5fr)}
+.host-slide-panel{min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden;border:1px solid rgba(245,200,0,.12);border-radius:14px;background:#2b2200;padding:2vh 2.2vw;position:relative}
+.host-slide-panel::before{position:absolute;left:.9rem;top:.7rem;font-size:clamp(.65rem,.75vw,.82rem);font-weight:900;letter-spacing:.12em;text-transform:uppercase;opacity:.78;pointer-events:none}
+.host-slide-panel.question-panel::before{content:'Question';color:#fff8e0}
+.host-slide-panel.answer-panel::before{content:'Answer';color:#b8f7d0}
+.host-slide-panel.extra-panel::before{content:'Extra Information';color:#f6d98b}
+.host-slide-question{width:100%;height:100%;display:flex;align-items:center;justify-content:center;text-align:center;font-size:4rem;line-height:1.08;font-weight:900;color:#fff8e0;white-space:pre-wrap;overflow:hidden;overflow-wrap:anywhere}
+.host-slide-answer,.host-slide-extra{width:100%;height:100%;display:flex;align-items:center;justify-content:center;text-align:center;font-size:2rem;line-height:1.2;font-weight:800;white-space:pre-wrap;overflow:hidden;overflow-wrap:anywhere}
+.host-slide-answer{color:#b8f7d0}
+.host-slide-extra{font-weight:700;color:#f6d98b}
+.host-slide-answer.hidden,.host-slide-extra.hidden,.host-slide-answer-panel.hidden,.host-slide-extra-panel.hidden{display:none}
+.host-slide-controls{flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;gap:.8rem;margin-top:1.4vh;padding-top:1.1vh;border-top:1px solid var(--border)}
+.host-slide-controls .group{display:flex;align-items:center;gap:.6rem}
+.host-slide-counter{font-size:clamp(.85rem,1vw,1.05rem);font-weight:800;color:var(--muted);min-width:10rem;text-align:center}
+.host-slide-controls button{font-size:clamp(.9rem,1.1vw,1.15rem);padding:.7rem 1rem}
+.host-contents{width:100vw;height:100vh;display:none;flex-direction:column;padding:4vh 5vw;background:#221c00;overflow:hidden}
+.host-contents.open{display:flex}
+.host-contents-title{font-size:clamp(1.5rem,3vw,2.6rem);font-weight:900;margin-bottom:.35rem}
+.host-contents-subtitle{font-size:clamp(.85rem,1.2vw,1.1rem);color:var(--muted);font-weight:700;margin-bottom:2.5vh}
+.host-contents-rounds{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;flex:0 0 16vh;height:16vh;max-height:16vh;min-height:92px;overflow-y:auto;overflow-x:hidden;align-content:start;padding-right:.2rem}
+.host-contents-round{min-height:72px;height:72px;text-align:left;padding:1rem 1.1rem}
+.host-contents-round.active{outline:3px solid rgba(245,200,0,.32);transform:translateY(-1px)}
+.host-contents-round-name{display:block;font-size:clamp(1rem,1.7vw,1.45rem);font-weight:900}
+.host-contents-round-count{display:block;margin-top:.3rem;font-size:clamp(.8rem,1vw,1rem);color:var(--muted);font-weight:800}
+.host-contents-questions{margin-top:2.2vh;min-height:0;display:flex;flex:1 1 auto;flex-direction:column;overflow:hidden}
+.host-contents-question-title{font-size:clamp(1rem,1.5vw,1.3rem);font-weight:900;margin-bottom:.9rem}
+.host-contents-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));grid-auto-rows:minmax(0,1fr);gap:.9rem;overflow:hidden;flex:1 1 auto;min-height:0}
+.host-contents-q{width:100%;height:auto;max-width:100%;max-height:100%;min-width:0;min-height:0;aspect-ratio:1/1;border-radius:50%;justify-self:center;align-self:center;display:flex;align-items:center;justify-content:center;font-size:clamp(.9rem,1.6vw,1.4rem);font-weight:900;padding:0;overflow:hidden}
+.host-contents-empty{color:var(--muted);font-weight:800;padding:1rem 0}
+@media (max-width:700px){.host-slide{padding:1.4vh 3vw 1.2vh}.host-slide-top{padding-right:7.5rem;margin-bottom:1vh}.host-slide-panel{padding:1.5vh 3vw;border-radius:10px}.host-slide-controls{gap:.5rem}.host-slide-controls .group{gap:.4rem}.host-slide-counter{min-width:6.5rem}.host-slide-controls button{padding:.6rem .7rem}.host-contents{padding:3vh 4vw}.host-contents-rounds{grid-template-columns:repeat(2,minmax(0,1fr));flex-basis:16vh;height:16vh;max-height:16vh}.host-contents-grid{grid-template-columns:repeat(5,minmax(0,1fr));gap:.5rem}}
+
 </style>
 </head>
 <body>
@@ -236,10 +279,49 @@ label{display:block;font-size:0.75rem;font-weight:800;text-transform:uppercase;l
           <div class="section-title" style="margin:0">Host View</div>
           <div id="hostSummary" class="q-extra" style="margin-top:.25rem"></div>
         </div>
-        <button class="secondary sm" id="hostBack">← Question Bank</button>
+        <div class="btn-row" style="gap:.45rem"><button class="secondary sm" id="hostSlideshowBtn">🖥 Slideshow</button><button class="secondary sm" id="hostBack">← Question Bank</button></div>
       </div>
       <div id="roundTabs" class="cat-grid" style="margin-bottom:1.2rem"></div>
       <div id="hostQuestions"></div>
+    </div>
+
+    <div id="hostSlideshow" class="host-slideshow" aria-hidden="true">
+      <div id="hostContents" class="host-contents" aria-hidden="true">
+        <div class="host-contents-title">Quiz Contents</div>
+        <div class="host-contents-subtitle">Choose a round, then select a question.</div>
+        <div id="hostContentsRounds" class="host-contents-rounds"></div>
+        <div class="host-contents-questions">
+          <div id="hostContentsQuestionTitle" class="host-contents-question-title"></div>
+          <div id="hostContentsGrid" class="host-contents-grid"></div>
+        </div>
+      </div>
+      <div id="hostSlide" class="host-slide">
+        <div class="host-slide-top-actions">
+          <button class="secondary sm" id="hostSlideContents" type="button">☰ Contents</button>
+          <button class="secondary sm" id="hostSlideClose" type="button">✕ Close</button>
+        </div>
+        <div class="host-slide-top">
+          <span id="hostSlideRound" class="host-slide-round"></span>
+          <span id="hostSlideQuestionNum" class="host-slide-meta"></span>
+          <span id="hostSlideCategory" class="q-cat">Category</span>
+          <span id="hostSlideAuthor" class="host-slide-author"></span>
+        </div>
+        <div id="hostSlideBody" class="host-slide-body question-only">
+          <div class="host-slide-panel question-panel"><div id="hostSlideQuestion" class="host-slide-question"></div></div>
+          <div id="hostSlideAnswerPanel" class="host-slide-panel answer-panel host-slide-answer-panel hidden"><div id="hostSlideAnswer" class="host-slide-answer hidden"></div></div>
+          <div id="hostSlideExtraPanel" class="host-slide-panel extra-panel host-slide-extra-panel hidden"><div id="hostSlideExtra" class="host-slide-extra hidden"></div></div>
+        </div>
+        <div class="host-slide-controls">
+          <div class="group">
+            <button class="secondary" id="hostPrev" type="button">← Previous</button>
+            <button class="secondary" id="hostNext" type="button">Next →</button>
+          </div>
+          <div id="hostSlideCounter" class="host-slide-counter">Question 1 of 1</div>
+          <div class="group">
+            <button class="secondary" id="hostShowSlideAnswer" type="button" aria-expanded="false">Show Answer</button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div id="adminView" style="display:none">
@@ -294,7 +376,8 @@ const DEFAULT_STATUSES = ['Draft', 'Ready', 'Used'];
 const SAVED_PASSWORD = 'dp3612';
 let pw = localStorage.getItem('cb_pw') || sessionStorage.getItem('cb_pw') || SAVED_PASSWORD;
 let headers = [], H = {}, categories = [], people = [], rows = [];
-let activeCat = '', activeRound = '', busy = false, showAnswers = false;
+let activeCat = '', activeRound = '', busy = false, showAnswers = localStorage.getItem('cb_showAnswers') === 'true';
+let hostSlideIndex = 0, hostSlideRows = [], hostSlideAnswerShown = localStorage.getItem('cb_hostSlideAnswerShown') === 'true';
 
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -510,6 +593,165 @@ function renderHostView() {
     </div>`;
   }).join('');
 }
+function hostReadyRowsForActiveRound() {
+  const readyRows = rows.filter(r => get(r, 'Status').trim().toLowerCase() === 'ready');
+  return readyRows.filter(r => roundValue(r) === activeRound).slice().sort((a,b) => {
+    const qa = questionNumberValue(a), qb = questionNumberValue(b);
+    const na = Number(qa), nb = Number(qb);
+    if (Number.isFinite(na) && Number.isFinite(nb)) return na - nb;
+    if (Number.isFinite(na)) return -1;
+    if (Number.isFinite(nb)) return 1;
+    return qa.localeCompare(qb, undefined, {numeric:true, sensitivity:'base'});
+  });
+}
+
+function readyRoundsForContents() {
+  const ready = rows.filter(r => get(r, 'Status').trim().toLowerCase() === 'ready' && roundValue(r));
+  return [...new Set(ready.map(roundValue))].sort((a,b) => {
+    const na = Number(a), nb = Number(b);
+    if (Number.isFinite(na) && Number.isFinite(nb)) return na - nb;
+    if (Number.isFinite(na)) return -1;
+    if (Number.isFinite(nb)) return 1;
+    return a.localeCompare(b, undefined, {numeric:true, sensitivity:'base'});
+  });
+}
+
+function showHostContents() {
+  const rounds = readyRoundsForContents();
+  if (!rounds.length) return toast('No Ready questions are available', true);
+  if (!activeRound || !rounds.includes(activeRound)) activeRound = rounds[0];
+  $('hostSlide').style.display = 'none';
+  $('hostContents').style.display = 'flex';
+  $('hostContents').setAttribute('aria-hidden', 'false');
+  renderHostContents();
+}
+
+function renderHostContents() {
+  const rounds = readyRoundsForContents();
+  if (!rounds.length) {
+    $('hostContentsRounds').innerHTML = '<div class="host-contents-empty">No Ready questions are available.</div>';
+    $('hostContentsQuestionTitle').textContent = '';
+    $('hostContentsGrid').innerHTML = '';
+    $('hostContentsGrid').style.gridTemplateRows = '';
+    return;
+  }
+  if (!activeRound || !rounds.includes(activeRound)) activeRound = rounds[0];
+  $('hostContentsRounds').innerHTML = rounds.map(rd => {
+    const count = rows.filter(r => get(r,'Status').trim().toLowerCase() === 'ready' && roundValue(r) === rd).length;
+    const label = /^\d+$/.test(String(rd)) ? String(rd).padStart(2,'0') : String(rd);
+    return `<button class="cat-card host-contents-round ${rd === activeRound ? 'active' : ''}" data-contents-round="${esc(rd)}"><span class="host-contents-round-name">Round ${esc(label)}</span><span class="host-contents-round-count">${count} Ready question${count === 1 ? '' : 's'}</span></button>`;
+  }).join('');
+
+  const qRows = hostReadyRowsForActiveRound();
+  const label = /^\d+$/.test(String(activeRound)) ? String(activeRound).padStart(2,'0') : String(activeRound);
+  $('hostContentsQuestionTitle').textContent = `Round ${label} · ${qRows.length} question${qRows.length === 1 ? '' : 's'}`;
+  $('hostContentsGrid').innerHTML = qRows.length ? qRows.map((r,i) => {
+    const qn = questionNumberValue(r);
+    const shown = qn && /^\d+$/.test(String(qn)) ? String(qn) : String(i+1);
+    return `<button class="secondary host-contents-q" data-contents-question="${i}" title="Open question ${esc(shown)}">${esc(shown)}</button>`;
+  }).join('') : '<div class="host-contents-empty">No Ready questions in this round.</div>';
+  if (qRows.length) {
+    const cols = Math.min(5, qRows.length);
+    const gridRows = Math.ceil(qRows.length / cols);
+    $('hostContentsGrid').style.gridTemplateColumns = `repeat(${cols}, minmax(0, 1fr))`;
+    $('hostContentsGrid').style.gridTemplateRows = `repeat(${gridRows}, minmax(0, 1fr))`;
+  } else {
+    $('hostContentsGrid').style.gridTemplateColumns = '';
+    $('hostContentsGrid').style.gridTemplateRows = '';
+  }
+}
+
+function openHostSlideAt(index) {
+  hostSlideRows = hostReadyRowsForActiveRound();
+  if (!hostSlideRows.length) return toast('No Ready questions in this round', true);
+  hostSlideIndex = Math.max(0, Math.min(index, hostSlideRows.length - 1));
+  $('hostContents').style.display = 'none';
+  $('hostContents').setAttribute('aria-hidden', 'true');
+  $('hostSlide').style.display = 'flex';
+  renderHostSlide();
+}
+
+function enterHostSlideshow() {
+  $('hostSlideshow').classList.add('open');
+  $('hostSlideshow').setAttribute('aria-hidden', 'false');
+  document.body.style.overflow = 'hidden';
+  showHostContents();
+  if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(() => {});
+}
+
+function exitHostSlideshow() {
+  $('hostSlideshow').classList.remove('open');
+  $('hostSlideshow').setAttribute('aria-hidden', 'true');
+  $('hostContents').style.display = 'none';
+  $('hostContents').setAttribute('aria-hidden', 'true');
+  $('hostSlide').style.display = 'flex';
+  document.body.style.overflow = '';
+  if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(() => {});
+}
+
+function fitHostText(el, maxPx, minPx = 12) {
+  if (!el || !el.textContent.trim() || !el.clientHeight) return;
+  el.style.fontSize = maxPx + 'px';
+  const fits = () => el.scrollHeight <= el.clientHeight + 1 && el.scrollWidth <= el.clientWidth + 1;
+  if (fits()) return;
+  let lo = minPx, hi = maxPx, best = minPx;
+  for (let i = 0; i < 14; i++) {
+    const mid = (lo + hi) / 2;
+    el.style.fontSize = mid + 'px';
+    if (fits()) { best = mid; lo = mid; } else hi = mid;
+  }
+  el.style.fontSize = best + 'px';
+}
+
+function fitHostSlideText() {
+  const q = $('hostSlideQuestion');
+  const a = $('hostSlideAnswer');
+  const x = $('hostSlideExtra');
+  const w = $('hostSlide').clientWidth;
+  const h = $('hostSlide').clientHeight;
+  fitHostText(q, Math.max(36, Math.min(120, w * 0.06, h * 0.13)), 20);
+  if (!a.classList.contains('hidden')) fitHostText(a, Math.max(22, Math.min(84, w * 0.04, h * 0.08)), 16);
+  if (x && !x.classList.contains('hidden') && x.textContent.trim()) fitHostText(x, Math.max(18, Math.min(64, w * 0.03, h * 0.06)), 14);
+}
+
+function renderHostSlide() {
+  const r = hostSlideRows[hostSlideIndex];
+  if (!r) return;
+  const cat = get(r,'Category') || 'Uncategorised';
+  const qn = questionNumberValue(r);
+  const author = get(r,'Author').trim();
+  const extra = get(r,'Extra Information').trim();
+  $('hostSlideRound').textContent = 'Round ' + activeRound;
+  $('hostSlideQuestionNum').textContent = qn ? 'Question ' + qn : 'Question ' + (hostSlideIndex + 1);
+  $('hostSlideCategory').className = 'q-cat ' + categoryClass(cat);
+  $('hostSlideCategory').textContent = cat;
+  $('hostSlideAuthor').textContent = author ? 'Author: ' + author : '';
+  $('hostSlideQuestion').textContent = get(r,'Question');
+  $('hostSlideAnswer').textContent = get(r,'Answer');
+  $('hostSlideExtra').textContent = extra;
+  const hasExtra = !!extra;
+  const show = hostSlideAnswerShown;
+  $('hostSlideBody').className = 'host-slide-body ' + (show ? (hasExtra ? 'three' : 'two') : 'question-only');
+  $('hostSlideAnswerPanel').classList.toggle('hidden', !show);
+  $('hostSlideAnswer').classList.toggle('hidden', !show);
+  $('hostSlideExtraPanel').classList.toggle('hidden', !(show && hasExtra));
+  $('hostSlideExtra').classList.toggle('hidden', !(show && hasExtra));
+  $('hostShowSlideAnswer').textContent = show ? 'Hide Answer' : 'Show Answer';
+  $('hostShowSlideAnswer').setAttribute('aria-expanded', show ? 'true' : 'false');
+  $('hostSlideCounter').textContent = `Question ${hostSlideIndex + 1} of ${hostSlideRows.length}`;
+  $('hostPrev').disabled = hostSlideIndex === 0;
+  $('hostNext').disabled = hostSlideIndex === hostSlideRows.length - 1;
+  requestAnimationFrame(() => requestAnimationFrame(fitHostSlideText));
+}
+
+function moveHostSlide(delta) {
+  if (!hostSlideRows.length) return;
+  const next = hostSlideIndex + delta;
+  if (next < 0 || next >= hostSlideRows.length) return;
+  hostSlideIndex = next;
+  renderHostSlide();
+}
+
 function renderCatList() {
   const counts = {}; rows.forEach(r => { const c = get(r, 'Category').trim(); if (c) counts[c] = (counts[c] || 0) + 1; });
   $('catList').innerHTML = categories.length ? categories.map(c => `
@@ -753,17 +995,68 @@ $('importFile').onchange = e => {
 $('clearBtn').onclick = clearAllFlow;
 
 $('questionBankBtn').onclick = () => {
+  exitHostSlideshow();
   $('hostView').style.display = 'none';
   $('adminView').style.display = 'none';
   $('mainView').style.display = '';
 };
 $('hostBtn').onclick = () => {
+  exitHostSlideshow();
   $('mainView').style.display = 'none'; $('adminView').style.display = 'none'; $('hostView').style.display = '';
   renderHostView();
 };
-$('hostBack').onclick = () => { $('hostView').style.display = 'none'; $('mainView').style.display = ''; };
+$('hostBack').onclick = () => { exitHostSlideshow(); $('hostView').style.display = 'none'; $('mainView').style.display = ''; };
 $('roundTabs').addEventListener('click', e => { const b = e.target.closest('[data-round]'); if (!b) return; activeRound = b.dataset.round; renderHostView(); });
 $('hostQuestions').addEventListener('click', e => { const b = e.target.closest('[data-host-answer]'); if (!b) return; const c = document.querySelector(`[data-host-answer-content="${CSS.escape(b.dataset.hostAnswer)}"]`); if (!c) return; const show = c.classList.toggle('hidden') === false; b.textContent = show ? 'Hide Answer' : 'Show Answer'; b.setAttribute('aria-expanded', show ? 'true' : 'false'); });
+$('hostSlideshowBtn').onclick = enterHostSlideshow;
+$('hostSlideClose').onclick = exitHostSlideshow;
+$('hostSlideContents').onclick = showHostContents;
+$('hostPrev').onclick = () => moveHostSlide(-1);
+$('hostNext').onclick = () => moveHostSlide(1);
+$('hostShowSlideAnswer').onclick = () => {
+  hostSlideAnswerShown = !hostSlideAnswerShown;
+  localStorage.setItem('cb_hostSlideAnswerShown', hostSlideAnswerShown ? 'true' : 'false');
+  const c = $('hostSlideAnswer');
+  const show = hostSlideAnswerShown;
+  const answerPanel = $('hostSlideAnswerPanel');
+  const extraPanel = $('hostSlideExtraPanel');
+  const extra = $('hostSlideExtra');
+  const hasExtra = !!extra.textContent.trim();
+  c.classList.toggle('hidden', !show);
+  answerPanel.classList.toggle('hidden', !show);
+  extraPanel.classList.toggle('hidden', !(show && hasExtra));
+  extra.classList.toggle('hidden', !(show && hasExtra));
+  $('hostSlideBody').className = 'host-slide-body ' + (show ? (hasExtra ? 'three' : 'two') : 'question-only');
+  $('hostShowSlideAnswer').textContent = show ? 'Hide Answer' : 'Show Answer';
+  $('hostShowSlideAnswer').setAttribute('aria-expanded', show ? 'true' : 'false');
+  requestAnimationFrame(() => requestAnimationFrame(fitHostSlideText));
+};
+$('hostContentsRounds').addEventListener('click', e => {
+  const b = e.target.closest('[data-contents-round]');
+  if (!b) return;
+  activeRound = b.dataset.contentsRound;
+  renderHostContents();
+});
+$('hostContentsGrid').addEventListener('click', e => {
+  const b = e.target.closest('[data-contents-question]');
+  if (!b) return;
+  openHostSlideAt(Number(b.dataset.contentsQuestion));
+});
+$('hostSlideshow').addEventListener('click', e => { if (e.target === $('hostSlideshow')) exitHostSlideshow(); });
+window.addEventListener('resize', () => {
+  if ($('hostSlideshow').classList.contains('open') && $('hostSlide').style.display !== 'none') fitHostSlideText();
+});
+
+document.addEventListener('keydown', e => {
+  if (!$('hostSlideshow').classList.contains('open')) return;
+  if (e.key === 'Escape') { e.preventDefault(); exitHostSlideshow(); }
+  else if ($('hostSlide').style.display !== 'none') {
+    if (e.key === 'ArrowLeft') { e.preventDefault(); moveHostSlide(-1); }
+    else if (e.key === 'ArrowRight') { e.preventDefault(); moveHostSlide(1); }
+    else if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); $('hostShowSlideAnswer').click(); }
+    else if (e.key.toLowerCase() === 'c') { e.preventDefault(); showHostContents(); }
+  }
+});
 
 $('adminBtn').onclick = () => {
   $('mainView').style.display = 'none';
@@ -779,6 +1072,7 @@ $('addQBtn').onclick = () => { if (headers.length) questionForm(null); };
 $('search').oninput = render; $('fAuthor').onchange = render; $('fStatus').onchange = render;
 $('answerToggle').onclick = () => {
   showAnswers = !showAnswers;
+  localStorage.setItem('cb_showAnswers', showAnswers ? 'true' : 'false');
   $('answerToggle').textContent = showAnswers ? 'Hide All Answers' : 'Show All Answers';
   $('answerToggle').setAttribute('aria-pressed', showAnswers ? 'true' : 'false');
   render();
@@ -789,6 +1083,8 @@ $('overlay').addEventListener('mousedown', e => { if (e.target === $('overlay') 
 (async function init() {
   if (API_URL.startsWith('PASTE_')) { $('list').innerHTML = '<div class="empty">Set API_URL at the top of the script.</div>'; return; }
   if (!pw) { $('list').innerHTML = ''; return askPassword(); }
+  $('answerToggle').textContent = showAnswers ? 'Hide All Answers' : 'Show All Answers';
+  $('answerToggle').setAttribute('aria-pressed', showAnswers ? 'true' : 'false');
   try { await load(); } catch (e) { toast(e.message, true); lock(); }
 })();
 </script>
