@@ -90,7 +90,7 @@ label{display:block;font-size:0.75rem;font-weight:800;text-transform:uppercase;l
 .answer-reveal.standalone{grid-column:1/-1}
 .q-meta{font-size:.7rem;color:var(--muted);font-weight:700;margin-top:.65rem;padding-top:.55rem;border-top:1px solid rgba(74,60,0,.45);display:flex;flex-wrap:wrap;gap:.3rem .75rem}
 .q-meta span{white-space:nowrap}
-.q-info{font-size:.78rem;color:#efd38a;font-weight:650;line-height:1.45;white-space:pre-wrap;margin-top:.6rem;padding:.7rem .75rem;border:1px solid rgba(251,191,36,.18);border-radius:10px;background:rgba(251,191,36,.055)}
+.q-info{font-size:.78rem;color:#efd38a;font-weight:650;line-height:1.45;white-space:pre-wrap;margin-top:.6rem}
 .q-info-label{display:block;font-size:.62rem;text-transform:uppercase;letter-spacing:.09em;font-weight:900;color:#fbbf24;margin-bottom:.22rem;line-height:1.2}
 @media (max-width:700px){
   .q-top{grid-template-columns:1fr;gap:.55rem}
@@ -217,7 +217,7 @@ label{display:block;font-size:0.75rem;font-weight:800;text-transform:uppercase;l
   .category-picker{flex-direction:row}
 }
 
-.host-round-title{display:flex;align-items:center;gap:.65rem;margin:1rem 0 .75rem;font-size:1.05rem;font-weight:800}.host-question{position:relative;margin-bottom:.8rem;padding:1rem 1.1rem;border:1px solid var(--border);border-left:5px solid var(--accent);border-radius:12px;background:#221c00 !important;box-shadow:0 2px 8px rgba(0,0,0,.04)}.host-q-top{display:flex;align-items:center;gap:.55rem;flex-wrap:wrap;margin-bottom:.45rem}.host-q-num{font-weight:800;font-size:.8rem;color:var(--muted)}.host-q-text{font-size:1.02rem;font-weight:700;line-height:1.45}.host-answer{margin-top:.7rem;padding-top:.7rem;border-top:1px dashed var(--border);font-weight:650}.host-answer.hidden{display:none}.round-tab{cursor:pointer}.round-tab.active{outline:3px solid rgba(0,0,0,.12);transform:translateY(-1px)}
+.host-round-title{display:flex;align-items:center;gap:.65rem;margin:1rem 0 .75rem;font-size:1.05rem;font-weight:800}.host-question{position:relative;margin-bottom:.8rem;padding:1rem 1.1rem;border:1px solid var(--border);border-left:5px solid var(--accent);border-radius:12px;background:#221c00 !important;box-shadow:0 2px 8px rgba(0,0,0,.04)}.host-q-top{display:flex;align-items:center;gap:.55rem;flex-wrap:wrap;margin-bottom:.45rem}.host-q-num{font-weight:800;font-size:.8rem;color:var(--muted)}.host-q-text{font-size:1.02rem;font-weight:700;line-height:1.45}.host-answer{margin-top:.7rem;padding-top:.7rem;border-top:1px dashed var(--border);font-weight:650}.host-answer.hidden{display:none}.host-extra{margin-top:.6rem;padding-top:.6rem;border-top:1px dashed var(--border);font-size:.85rem;font-style:italic;color:var(--muted);line-height:1.4}.round-tab{cursor:pointer}.round-tab.active{outline:3px solid rgba(0,0,0,.12);transform:translateY(-1px)}
 .pwa-spacer{display:none}
 @media (display-mode: standalone), (display-mode: fullscreen){
   body{min-height:100dvh}
@@ -468,6 +468,7 @@ input::placeholder,textarea::placeholder{color:#64748b}
 .host-question{background:#111a2b!important;border-color:#2a3950!important;box-shadow:0 8px 24px rgba(0,0,0,.16)}
 .host-q-num{color:#8ea0b7}
 .host-answer{border-color:#34445c}
+.host-extra{color:#8ea0b7;border-color:#2a3950}
 /* Host View admin screen */
 #hostView{padding-bottom:2rem}
 #hostView .section-title{color:#f4b942}
@@ -846,8 +847,6 @@ header{
   border-color:#314159 !important;
 }
 .q-info{
-  background:#172235 !important;
-  border-color:rgba(244,185,66,.2) !important;
   color:#cbd5e1 !important;
 }
 .modal{background:#111a2b !important;}
@@ -936,8 +935,6 @@ html, body, #app, #mainView, #hostView, #adminView {
 #list .q-answer { color:#a7f3c0 !important; }
 #list .q-answer-label { color:#86efac !important; }
 #list .q-info {
-  background:#172235 !important;
-  border:1px solid #3b4160 !important;
   color:#cbd5e1 !important;
 }
 #list .q-info-label { color:#c4b5fd !important; }
@@ -1327,9 +1324,9 @@ function render() {
           <div class="q-answer-content ${showAnswers ? '' : 'hidden'}">
             <span class="q-answer-label">Answer</span>
             <div class="q-answer" data-answer="${r.row}">${esc(get(r, 'Answer'))}</div>
+            ${get(r, 'Extra Information') ? `<div class="q-info"><span class="q-info-label">Extra Information</span>${esc(get(r, 'Extra Information'))}</div>` : ''}
           </div>
         </div>
-        ${get(r, 'Extra Information') ? `<div class="q-info"><span class="q-info-label">Extra Information</span>${esc(get(r, 'Extra Information'))}</div>` : ''}
         <div class="q-meta">
           ${author ? `<span>👤 ${esc(author)}</span>` : ''}
           ${rd ? `<span>Round ${esc(rd)}</span>` : ''}
@@ -1387,6 +1384,7 @@ function renderHostView() {
     const cat = get(r,'Category') || 'Uncategorised';
     const qn = questionNumberValue(r);
     const ans = get(r,'Answer');
+    const extra = get(r,'Extra Information').trim();
     return `<div class="host-question ${categoryClass(cat)}">
       <div class="host-q-top">
         <span class="q-cat ${categoryClass(cat)}">${esc(cat)}</span>
@@ -1394,7 +1392,10 @@ function renderHostView() {
       </div>
       <div class="host-q-text">${esc(get(r,'Question'))}</div>
       <button class="secondary sm" style="margin-top:.7rem" data-host-answer="${r.row}" aria-expanded="false">Show Answer</button>
-      <div class="host-answer hidden" data-host-answer-content="${r.row}">${esc(ans)}</div>
+      <div class="host-answer hidden" data-host-answer-content="${r.row}">
+        ${esc(ans)}
+        ${extra ? `<div class="host-extra">${esc(extra)}</div>` : ''}
+      </div>
     </div>`;
   }).join('');
 }
