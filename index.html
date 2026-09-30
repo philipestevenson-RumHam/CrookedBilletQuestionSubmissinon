@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="Crooked Billet"/>
 <meta name="mobile-web-app-capable" content="yes"/>
-<meta name="theme-color" content="#1a1400"/>
+<meta name="theme-color" content="#0b1220"/>
 <title>Crooked Billet – Quiz Question Bank</title>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
 <style>
@@ -897,6 +897,143 @@ input:focus,select:focus,textarea:focus{background:#111a2b !important;}
   .card,.stat-card,.q-card,#list .card,.host-question{background:#111a2b !important;}
 }
 
+
+/* =========================================================
+   FINAL CONSISTENCY + QUESTION BANK ANSWER FIX
+   ========================================================= */
+
+/* Eliminate every remaining legacy brown/yellow surface in the Question Bank. */
+html,
+body,
+#app,
+#mainView,
+#hostView,
+#adminView {
+  background-color:#0b1220 !important;
+  background-image:none !important;
+}
+
+#list .q-card,
+#list .q-card:hover,
+#list .q-card:focus,
+#list .q-card:focus-within,
+#list .q-card:active,
+#list .q-card.cat-geography,
+#list .q-card.cat-entertainment,
+#list .q-card.cat-history,
+#list .q-card.cat-art-literature,
+#list .q-card.cat-science,
+#list .q-card.cat-sports-leisure,
+#list .q-card.cat-name-year,
+#list .q-card.cat-other {
+  background:#111a2b !important;
+  color:#f4f7fb !important;
+  border-color:#2a3950 !important;
+  box-shadow:0 8px 24px rgba(0,0,0,.14) !important;
+}
+
+#list .q-card:hover,
+#list .q-card:focus-within {
+  border-color:#3b4e69 !important;
+  box-shadow:0 12px 30px rgba(0,0,0,.20) !important;
+}
+
+/* Keep the category identity as a small accent, never a brown card fill. */
+#list .q-card.cat-geography{border-left-color:#38bdf8 !important}
+#list .q-card.cat-entertainment{border-left-color:#c084fc !important}
+#list .q-card.cat-history{border-left-color:#fbbf24 !important}
+#list .q-card.cat-art-literature{border-left-color:#f472b6 !important}
+#list .q-card.cat-science{border-left-color:#4ade80 !important}
+#list .q-card.cat-sports-leisure{border-left-color:#f87171 !important}
+#list .q-card.cat-name-year{border-left-color:#fb923c !important}
+
+/* Answer and extra-information areas use the same professional theme. */
+#list .q-answer-row {
+  background:#172235 !important;
+  border:1px solid #314159 !important;
+  color:#f4f7fb !important;
+}
+#list .q-answer-content {
+  min-width:0;
+}
+#list .q-answer-content.hidden {
+  display:none !important;
+}
+#list .q-answer {
+  color:#a7f3c0 !important;
+}
+#list .q-answer-label {
+  color:#86efac !important;
+}
+#list .q-info {
+  background:#172235 !important;
+  border:1px solid #3b4160 !important;
+  color:#cbd5e1 !important;
+}
+#list .q-info-label {
+  color:#c4b5fd !important;
+}
+
+/* Make the individual Show/Hide button unambiguous and readable. */
+#list .answer-reveal {
+  white-space:nowrap !important;
+  flex:0 0 auto !important;
+  align-self:start !important;
+}
+#list .answer-reveal:hover,
+#list .answer-reveal:focus {
+  transform:none !important;
+}
+
+/* Host View round tabs — same palette and readable text. */
+#hostView #roundTabs .round-tab,
+#hostView #roundTabs .round-tab:hover,
+#hostView #roundTabs .round-tab:focus,
+#hostView #roundTabs .round-tab:active {
+  background:#172235 !important;
+  color:#f4f7fb !important;
+  border:1px solid #34445c !important;
+  transform:none !important;
+  overflow:hidden !important;
+}
+#hostView #roundTabs .round-tab .cat-name,
+#hostView #roundTabs .round-tab .cat-count {
+  color:#f4f7fb !important;
+}
+#hostView #roundTabs .round-tab .cat-count {
+  color:#b9c7d8 !important;
+}
+#hostView #roundTabs .round-tab.active {
+  background:rgba(244,185,66,.14) !important;
+  border-color:#f4b942 !important;
+  color:#fff !important;
+}
+#hostView #roundTabs .round-tab.active .cat-name,
+#hostView #roundTabs .round-tab.active .cat-count {
+  color:#fff !important;
+}
+
+/* Mobile: explicitly repeat the same surfaces so no legacy media rule can win. */
+@media (max-width:700px) {
+  html,body,#app,#mainView,#hostView,#adminView {
+    background:#0b1220 !important;
+    background-image:none !important;
+  }
+  #list .q-card,
+  #list .q-card:hover,
+  #list .q-card:focus,
+  #list .q-card:focus-within,
+  #list .q-card:active {
+    background:#111a2b !important;
+  }
+  #list .q-answer-row {
+    background:#172235 !important;
+  }
+  #list .q-info {
+    background:#172235 !important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -1642,11 +1779,10 @@ $('list').addEventListener('click', async e => {
   const ans = e.target.closest('[data-answer-toggle]');
   if (ans) {
     const card = ans.closest('.q-card');
-    const answer = card?.querySelector('[data-answer]');
-    const label = card?.querySelector('.q-answer-label');
-    const open = answer && answer.classList.contains('hidden');
-    answer?.classList.toggle('hidden', !open);
-    label?.classList.toggle('hidden', !open);
+    const content = card?.querySelector('.q-answer-content');
+    if (!content) return;
+    const open = content.classList.contains('hidden');
+    content.classList.toggle('hidden', !open);
     ans.textContent = open ? 'Hide Answer' : 'Show Answer';
     ans.setAttribute('aria-expanded', open ? 'true' : 'false');
     return;
