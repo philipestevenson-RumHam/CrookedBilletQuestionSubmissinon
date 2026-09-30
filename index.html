@@ -381,6 +381,428 @@ label{display:block;font-size:0.75rem;font-weight:800;text-transform:uppercase;l
   .host-contents-round{min-height:56px;height:56px;padding:.6rem .65rem}
 }
 
+
+/* Professional visual polish — functionality intentionally unchanged */
+:root{
+  --bg:#0b1220;
+  --surface:#111a2b;
+  --surface2:#172235;
+  --border:#2a3950;
+  --accent:#f4b942;
+  --accent-hover:#ffc95f;
+  --text:#f4f7fb;
+  --muted:#93a4ba;
+  --green:#4ade80;
+  --red:#fb7185;
+  --shadow:0 12px 32px rgba(0,0,0,.22);
+}
+html{background:var(--bg)}
+body{
+  background:var(--bg);
+  background-image:radial-gradient(circle at 15% 0%,rgba(244,185,66,.07),transparent 30%),radial-gradient(circle at 85% 10%,rgba(96,165,250,.06),transparent 28%);
+  color:var(--text);
+  font-family:'Nunito',system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+}
+header{
+  position:sticky;top:0;z-index:100;
+  background:rgba(11,18,32,.94);
+  border-bottom:1px solid rgba(255,255,255,.08);
+  box-shadow:0 8px 28px rgba(0,0,0,.18);
+  backdrop-filter:blur(14px);
+  padding:1rem clamp(1rem,3vw,2.25rem);
+}
+header .logo{filter:drop-shadow(0 3px 10px rgba(244,185,66,.2));}
+header h1{color:#fff;font-size:1.25rem;letter-spacing:-.025em;text-shadow:none}
+header .subtitle{color:#8192aa}
+.container{max-width:1380px;padding:1.4rem clamp(1rem,2.5vw,2rem) 3rem}
+.section-title{font-size:.72rem;color:#d7a53c;letter-spacing:.14em;border-bottom:1px solid rgba(244,185,66,.18);margin:1.8rem 0 1rem;padding-bottom:.55rem}
+.card{
+  background:rgba(17,26,43,.96)!important;
+  border:1px solid rgba(255,255,255,.08)!important;
+  border-radius:18px;
+  box-shadow:var(--shadow);
+  padding:1.35rem;
+}
+.card-title{color:#e7b34b}
+button{
+  background:var(--accent);color:#18202b;border:1px solid rgba(255,255,255,.08);
+  border-radius:10px;padding:.62rem 1rem;box-shadow:0 5px 16px rgba(244,185,66,.16);
+}
+button:hover{background:var(--accent-hover);box-shadow:0 8px 22px rgba(244,185,66,.2)}
+button.secondary{background:#172235;color:#b7c4d5;border:1px solid #314159;box-shadow:none}
+button.secondary:hover{background:#1d2b42;color:#fff;border-color:#445875}
+button.danger{background:rgba(251,113,133,.08);color:#fb7185;border:1px solid rgba(251,113,133,.25)}
+input,select,textarea{background:#111a2b;border:1px solid #2c3b52;color:var(--text);border-radius:11px}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);background:#111a2b;box-shadow:0 0 0 3px rgba(244,185,66,.1)}
+input::placeholder,textarea::placeholder{color:#64748b}
+.stat-card{
+  background:#111a2b!important;border:1px solid rgba(255,255,255,.08)!important;
+  box-shadow:0 8px 22px rgba(0,0,0,.12);border-radius:14px;
+}
+#cats.cat-grid,.cat-grid{scrollbar-color:#40516a transparent}
+.cat-card{background:#111a2b!important;border-color:#2b3a50!important;box-shadow:0 6px 18px rgba(0,0,0,.12)}
+.cat-card:hover{border-color:rgba(244,185,66,.65)!important;box-shadow:0 10px 24px rgba(0,0,0,.18)}
+.cat-card.active{background:rgba(244,185,66,.1)!important;border-color:var(--accent)!important;box-shadow:0 0 0 1px rgba(244,185,66,.65),0 10px 26px rgba(244,185,66,.12)}
+/* Keep category accents, but soften the backgrounds */
+#cats .cat-card.cat-geography,#cats .cat-card.cat-entertainment,#cats .cat-card.cat-history,#cats .cat-card.cat-art-literature,#cats .cat-card.cat-science,#cats .cat-card.cat-sports-leisure,#cats .cat-card.cat-name-year,#cats .cat-card.cat-other{background:#111a2b!important}
+#cats .cat-card.cat-geography{border-top:3px solid #38bdf8!important}
+#cats .cat-card.cat-entertainment{border-top:3px solid #c084fc!important}
+#cats .cat-card.cat-history{border-top:3px solid #fbbf24!important}
+#cats .cat-card.cat-art-literature{border-top:3px solid #f472b6!important}
+#cats .cat-card.cat-science{border-top:3px solid #4ade80!important}
+#cats .cat-card.cat-sports-leisure{border-top:3px solid #f87171!important}
+#cats .cat-card.cat-name-year{border-top:3px solid #fb923c!important}
+#cats .cat-card.cat-other{border-top:3px solid var(--accent)!important}
+/* Question cards */
+#list .card,.question-card,.q-card{
+  background:#111a2b!important;border:1px solid #2a3950!important;border-radius:16px!important;
+  box-shadow:0 8px 24px rgba(0,0,0,.14)!important;
+}
+#list .card:hover{border-color:#3b4e69!important;box-shadow:0 12px 30px rgba(0,0,0,.2)!important}
+.pill{background:#172235;border-color:#33445d;color:#9fb0c5}
+.pill.status-ready{background:rgba(74,222,128,.09);border-color:rgba(74,222,128,.3)}
+.pill.pts{background:rgba(244,185,66,.08);border-color:rgba(244,185,66,.28)}
+.q-meta,.q-id,.q-info{color:#8ea0b7}
+.host-question{background:#111a2b!important;border-color:#2a3950!important;box-shadow:0 8px 24px rgba(0,0,0,.16)}
+.host-q-num{color:#8ea0b7}
+.host-answer{border-color:#34445c}
+/* Host View admin screen */
+#hostView{padding-bottom:2rem}
+#hostView .section-title{color:#f4b942}
+/* Keep slideshow visually premium and separate from admin chrome */
+.host-slideshow{background:#080d17}
+.host-contents,.host-slide{background:#0b1220}
+.host-contents-round{background:#111a2b!important;border-color:#2a3950!important}
+.host-contents-round.active{background:rgba(244,185,66,.1)!important;border-color:var(--accent)!important}
+.host-contents-q{background:#172235;color:#f4f7fb;border-color:#3a4c66}
+.host-contents-q:hover{background:#21314a;border-color:#f4b942}
+/* Cleaner scrollbars */
+*{scrollbar-width:thin;scrollbar-color:#3b4b62 transparent}
+*::-webkit-scrollbar{width:8px;height:8px}
+*::-webkit-scrollbar-track{background:transparent}
+*::-webkit-scrollbar-thumb{background:#33445d;border-radius:99px}
+*::-webkit-scrollbar-thumb:hover{background:#4b607d}
+@media (max-width:700px){
+  header{padding:.75rem .9rem}
+  .container{padding:1rem .8rem 2.5rem}
+  .card{border-radius:15px;padding:1rem}
+}
+
+
+/* Slideshow controls refinement — prevent clipping and button text overflow */
+.host-slideshow .host-contents-rounds{
+  overflow-x:auto;
+  overflow-y:visible;
+  padding:.55rem .35rem .65rem;
+  margin:-.35rem -.35rem 0;
+  box-sizing:border-box;
+  scrollbar-gutter:stable;
+}
+.host-slideshow .host-contents-round{
+  flex:0 0 clamp(156px,19vw,230px);
+  min-width:clamp(156px,19vw,230px);
+  width:auto;
+  height:auto;
+  min-height:76px;
+  padding:.75rem 1rem;
+  margin:0;
+  box-sizing:border-box;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  justify-content:center;
+  gap:.18rem;
+  overflow:visible;
+  white-space:normal;
+  line-height:1.15;
+  transform-origin:center;
+  transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease, background .15s ease;
+}
+.host-slideshow .host-contents-round:hover{
+  transform:translateY(-3px) scale(1.015);
+  z-index:2;
+}
+.host-slideshow .host-contents-round.active{
+  transform:translateY(-2px);
+  z-index:2;
+}
+.host-slideshow .host-contents-round.active:hover{
+  transform:translateY(-3px) scale(1.015);
+}
+.host-slideshow .host-contents-round-name{
+  display:block;
+  width:100%;
+  min-width:0;
+  font-size:clamp(1rem,1.55vw,1.35rem);
+  line-height:1.15;
+  font-weight:900;
+  white-space:normal;
+  overflow-wrap:anywhere;
+  word-break:normal;
+}
+.host-slideshow .host-contents-round-count{
+  display:block;
+  width:100%;
+  min-width:0;
+  margin-top:0;
+  font-size:clamp(.72rem,.9vw,.92rem);
+  line-height:1.2;
+  font-weight:800;
+  white-space:normal;
+  overflow-wrap:anywhere;
+}
+.host-slideshow .host-slide-controls button{
+  overflow:visible;
+  white-space:nowrap;
+  line-height:1.15;
+  transform-origin:center;
+}
+.host-slideshow .host-slide-controls button:hover{
+  transform:translateY(-2px);
+}
+.host-slideshow .host-slide-top-actions button{
+  overflow:visible;
+  white-space:nowrap;
+  line-height:1.15;
+}
+@media (max-width:700px){
+  .host-slideshow .host-contents-rounds{
+    padding:.5rem .3rem .6rem;
+    margin:-.3rem -.3rem 0;
+  }
+  .host-slideshow .host-contents-round{
+    flex-basis:clamp(140px,43vw,200px);
+    min-width:clamp(140px,43vw,200px);
+    min-height:68px;
+    padding:.65rem .75rem;
+  }
+  .host-slideshow .host-contents-round-name{
+    font-size:1rem;
+    line-height:1.15;
+  }
+  .host-slideshow .host-contents-round-count{
+    font-size:.72rem;
+    line-height:1.2;
+  }
+}
+@media (max-width:700px) and (orientation:landscape){
+  .host-slideshow .host-contents-rounds{
+    flex-basis:15vh;
+    height:15vh;
+    max-height:15vh;
+    min-height:68px;
+    padding:.5rem .3rem .6rem;
+    margin:-.3rem -.3rem 0;
+  }
+  .host-slideshow .host-contents-round{
+    flex:0 0 clamp(128px,19vw,195px);
+    min-width:clamp(128px,19vw,195px);
+    height:auto;
+    min-height:58px;
+    padding:.55rem .7rem;
+  }
+  .host-slideshow .host-contents-round-name{font-size:.92rem}
+  .host-slideshow .host-contents-round-count{font-size:.68rem}
+}
+@media (hover:none){
+  .host-slideshow .host-contents-round:hover,
+  .host-slideshow .host-contents-round.active:hover,
+  .host-slideshow .host-slide-controls button:hover{
+    transform:none;
+  }
+}
+
+/* Final slideshow contents fixes — readable text and no clipped hover growth */
+.host-slideshow .host-contents-round{
+  color:#f4f7fb !important;
+  background:#111a2b !important;
+  border:1px solid #34445c !important;
+  outline-offset:3px;
+  box-shadow:0 5px 16px rgba(0,0,0,.16);
+  transform:none !important;
+}
+.host-slideshow .host-contents-round:hover{
+  color:#ffffff !important;
+  background:#172235 !important;
+  border-color:#5a6f8d !important;
+  transform:translateY(-1px) !important;
+  box-shadow:0 7px 18px rgba(0,0,0,.2);
+}
+.host-slideshow .host-contents-round.active,
+.host-slideshow .host-contents-round.active:hover{
+  color:#ffffff !important;
+  background:rgba(244,185,66,.12) !important;
+  border-color:#f4b942 !important;
+  outline:2px solid rgba(244,185,66,.65);
+  transform:none !important;
+  box-shadow:0 0 0 1px rgba(244,185,66,.18),0 7px 20px rgba(0,0,0,.2);
+}
+.host-slideshow .host-contents-round-name{
+  color:#f4f7fb !important;
+  text-shadow:none !important;
+}
+.host-slideshow .host-contents-round-count{
+  color:#b9c7d8 !important;
+  text-shadow:none !important;
+}
+/* Question-number buttons: keep the circles stable so the hover effect cannot be clipped by the grid. */
+.host-slideshow .host-contents-grid{
+  overflow:visible;
+}
+.host-slideshow .host-contents-q{
+  color:#f4f7fb !important;
+  background:#172235 !important;
+  border:1px solid #3a4c66 !important;
+  overflow:hidden;
+  transform:none !important;
+  transition:background .15s ease,border-color .15s ease,box-shadow .15s ease;
+}
+.host-slideshow .host-contents-q:hover{
+  color:#ffffff !important;
+  background:#21314a !important;
+  border-color:#f4b942 !important;
+  transform:none !important;
+  box-shadow:0 7px 18px rgba(0,0,0,.22);
+}
+@media (hover:none){
+  .host-slideshow .host-contents-round:hover,
+  .host-slideshow .host-contents-q:hover{transform:none !important}
+}
+
+
+/* Final host slideshow theme — align panels and header pills with the professional navy/slate theme */
+.host-slideshow .host-slide-top .host-slide-meta,
+.host-slideshow .host-slide-top .host-slide-round,
+.host-slideshow .host-slide-top .host-slide-author{
+  background:#111a2b !important;
+  border:1px solid #304158 !important;
+  color:#f4f7fb !important;
+  box-shadow:0 4px 14px rgba(0,0,0,.16);
+}
+.host-slideshow .host-slide-top .host-slide-round::before,
+.host-slideshow .host-slide-top .host-slide-meta::before,
+.host-slideshow .host-slide-top .host-slide-author::before{
+  color:#9fb0c5 !important;
+}
+.host-slideshow .host-slide-top .host-slide-round{
+  color:#ffffff !important;
+}
+
+/* The three content panels now use the same dark-slate family as the rest of the app,
+   with restrained category accents instead of the old brown/gold fill. */
+.host-slideshow .host-slide-panel{
+  background:#111a2b !important;
+  border:1px solid #2a3950 !important;
+  box-shadow:0 10px 28px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.025) !important;
+}
+.host-slideshow .host-slide-panel.question-panel{
+  border-top:2px solid #f4b942 !important;
+  background:linear-gradient(180deg,#172235 0%,#111a2b 100%) !important;
+}
+.host-slideshow .host-slide-panel.answer-panel{
+  border-top:2px solid #4ade80 !important;
+  background:linear-gradient(180deg,#13271f 0%,#111a2b 100%) !important;
+}
+.host-slideshow .host-slide-panel.extra-panel{
+  border-top:2px solid #a78bfa !important;
+  background:linear-gradient(180deg,#1b1930 0%,#111a2b 100%) !important;
+}
+.host-slideshow .host-slide-panel-label{
+  color:#dbe5f0 !important;
+  opacity:1 !important;
+}
+.host-slideshow .host-slide-panel.answer-panel .host-slide-panel-label{
+  color:#86efac !important;
+}
+.host-slideshow .host-slide-panel.extra-panel .host-slide-panel-label{
+  color:#c4b5fd !important;
+}
+.host-slideshow .host-slide-question{
+  color:#f8fafc !important;
+}
+.host-slideshow .host-slide-answer{
+  color:#a7f3c0 !important;
+}
+.host-slideshow .host-slide-extra{
+  color:#ddd6fe !important;
+}
+
+/* Make the header pills unmistakable at a glance. */
+.host-slideshow .host-slide-top .host-slide-round,
+.host-slideshow .host-slide-top .host-slide-meta,
+.host-slideshow .host-slide-top .host-slide-author{
+  font-weight:800 !important;
+  text-shadow:none !important;
+}
+
+
+/* Final Host View round-tab readability fix */
+#hostView #roundTabs .round-tab {
+  flex:0 0 auto !important;
+  min-width:0 !important;
+  width:auto !important;
+  height:auto !important;
+  min-height:42px !important;
+  padding:.65rem 1rem !important;
+  margin:0 !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:.18rem !important;
+  box-sizing:border-box !important;
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+  color:#f4f7fb !important;
+  background:#172235 !important;
+  border:1px solid #34445c !important;
+  border-radius:11px !important;
+  box-shadow:0 4px 14px rgba(0,0,0,.16) !important;
+  transform:none !important;
+  transition:background .15s ease,border-color .15s ease,box-shadow .15s ease !important;
+}
+#hostView #roundTabs .round-tab .cat-name,
+#hostView #roundTabs .round-tab .cat-count {
+  color:#f4f7fb !important;
+  font-weight:800 !important;
+  line-height:1.2 !important;
+  white-space:nowrap !important;
+  overflow:visible !important;
+  text-overflow:clip !important;
+}
+#hostView #roundTabs .round-tab .cat-count {
+  color:#b9c7d8 !important;
+  font-weight:700 !important;
+}
+#hostView #roundTabs .round-tab:hover {
+  color:#fff !important;
+  background:#21314a !important;
+  border-color:#5a6f8d !important;
+  box-shadow:0 6px 18px rgba(0,0,0,.22) !important;
+  transform:none !important;
+}
+#hostView #roundTabs .round-tab.active,
+#hostView #roundTabs .round-tab.active:hover {
+  color:#fff !important;
+  background:rgba(244,185,66,.14) !important;
+  border-color:#f4b942 !important;
+  box-shadow:0 0 0 1px rgba(244,185,66,.28),0 6px 18px rgba(244,185,66,.10) !important;
+  outline:none !important;
+  transform:none !important;
+}
+#hostView #roundTabs .round-tab.active .cat-name,
+#hostView #roundTabs .round-tab.active .cat-count { color:#fff !important; }
+#hostView #roundTabs .round-tab:focus-visible {
+  outline:2px solid #f4b942 !important;
+  outline-offset:2px !important;
+}
+@media (max-width:700px){
+  #hostView #roundTabs .round-tab {
+    min-height:40px !important;
+    padding:.58rem .8rem !important;
+    font-size:.82rem !important;
+  }
+}
 </style>
 </head>
 <body>
@@ -813,7 +1235,7 @@ function renderHostContents() {
   $('hostContentsGrid').innerHTML = qRows.length ? qRows.map((r,i) => {
     const qn = questionNumberValue(r);
     const shown = qn && /^\d+$/.test(String(qn)) ? String(qn) : String(i+1);
-    return `<button class="secondary host-contents-q" data-contents-question="${i}" title="Open question ${esc(shown)}">${esc(shown)}</button>`;
+    return `<button class="secondary host-contents-q" data-contents-question="${i}" aria-label="Open question ${esc(shown)}">${esc(shown)}</button>`;
   }).join('') : '<div class="host-contents-empty">No Ready questions in this round.</div>';
   if (qRows.length) {
     const cols = Math.min(5, qRows.length);
