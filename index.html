@@ -803,6 +803,100 @@ input::placeholder,textarea::placeholder{color:#64748b}
     font-size:.82rem !important;
   }
 }
+
+
+/* FINAL GLOBAL THEME SWEEP — remove legacy brown/yellow surfaces across every viewport */
+:root{
+  --bg:#0b1220 !important;
+  --surface:#111a2b !important;
+  --surface2:#172235 !important;
+  --border:#2a3950 !important;
+  --accent:#f4b942 !important;
+  --accent-hover:#ffc95f !important;
+  --text:#f4f7fb !important;
+  --muted:#93a4ba !important;
+}
+html,body{
+  background:#0b1220 !important;
+  background-image:none !important;
+}
+body{color:#f4f7fb !important;}
+body::before{
+  display:none !important;
+  content:none !important;
+  background:transparent !important;
+}
+#app{
+  background:#0b1220 !important;
+}
+header{
+  background:rgba(11,18,32,.96) !important;
+}
+#mainView,#hostView,#adminView{
+  background:transparent !important;
+}
+/* Main question-bank surfaces */
+.card,.stat-card,.q-card,#list .card,.question-card,.q-card,.host-question{
+  background:#111a2b !important;
+}
+.q-answer-row{
+  background:#172235 !important;
+  border-color:#314159 !important;
+}
+.q-info{
+  background:#172235 !important;
+  border-color:rgba(244,185,66,.2) !important;
+  color:#cbd5e1 !important;
+}
+.modal{background:#111a2b !important;}
+.tabs{background:#0f1727 !important;}
+input,select,textarea{background:#111a2b !important;color:#f4f7fb !important;}
+input:focus,select:focus,textarea:focus{background:#111a2b !important;}
+
+/* Host View (non-slideshow) */
+#hostView{background:#0b1220 !important;}
+#hostView #roundTabs{
+  background:transparent !important;
+}
+#hostView #roundTabs .round-tab{
+  color:#f4f7fb !important;
+  background:#172235 !important;
+}
+#hostView #roundTabs .round-tab .cat-name{color:#f4f7fb !important;}
+#hostView #roundTabs .round-tab .cat-count{color:#b9c7d8 !important;}
+
+/* Slideshow itself */
+.host-slideshow{background:#080d17 !important;}
+.host-slideshow .host-slide,
+.host-slideshow .host-contents{
+  background:#0b1220 !important;
+}
+.host-slideshow .host-slide-panel{
+  background:#111a2b !important;
+}
+.host-slideshow .host-slide-panel.question-panel{
+  background:linear-gradient(180deg,#172235 0%,#111a2b 100%) !important;
+}
+.host-slideshow .host-slide-panel.answer-panel{
+  background:linear-gradient(180deg,#13271f 0%,#111a2b 100%) !important;
+}
+.host-slideshow .host-slide-panel.extra-panel{
+  background:linear-gradient(180deg,#1b1930 0%,#111a2b 100%) !important;
+}
+
+/* Mobile must use exactly the same base palette — no legacy brown fallback. */
+@media (max-width:700px){
+  html,body,#app,#mainView,#hostView{
+    background:#0b1220 !important;
+    background-image:none !important;
+  }
+  .host-slideshow,.host-slideshow .host-slide,.host-slideshow .host-contents{
+    background:#0b1220 !important;
+  }
+  header{background:rgba(11,18,32,.98) !important;}
+  .card,.stat-card,.q-card,#list .card,.host-question{background:#111a2b !important;}
+}
+
 </style>
 </head>
 <body>
