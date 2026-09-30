@@ -33,8 +33,6 @@ header{
   display:flex;align-items:center;gap:0.75rem;box-shadow:0 4px 24px rgba(245,200,0,0.18);
 }
 header .logo{height:44px;width:auto;filter:drop-shadow(0 2px 6px rgba(245,200,0,0.5))}
-header #conn{font-size:.72rem;white-space:normal;text-align:right;line-height:1.2;max-width:290px}
-@media(max-width:700px){header #conn{max-width:210px;font-size:.66rem}}
 header h1{font-size:1.35rem;font-weight:900;color:var(--accent);letter-spacing:-0.01em;text-shadow:0 2px 8px rgba(245,200,0,0.4)}
 header .subtitle{font-size:0.78rem;color:var(--muted);margin-top:1px;font-weight:600}
 .badge{font-size:0.72rem;padding:0.25rem 0.65rem;border-radius:99px;font-weight:700}
@@ -900,26 +898,47 @@ input:focus,select:focus,textarea:focus{background:#111a2b !important;}
 }
 
 
-/* Final Crooked Billet theme cleanup */
-html,body,#app,#mainView,#hostView,#adminView{background-color:#0b1220!important;background-image:none!important}
-body::before{display:none!important}
-header{background:linear-gradient(135deg,#0b1220 0%,#111a2b 60%,#0b1220 100%)!important;border-bottom-color:#f5c800!important;box-shadow:0 4px 24px rgba(245,200,0,.12)!important}
+/* =========================================================
+   FINAL CONSISTENCY + QUESTION BANK ANSWER FIX
+   ========================================================= */
 
-/* FINAL QUESTION BANK THEME + ANSWER REVEAL FIX */
-html, body, #app, #mainView, #hostView, #adminView {
+/* Eliminate every remaining legacy brown/yellow surface in the Question Bank. */
+html,
+body,
+#app,
+#mainView,
+#hostView,
+#adminView {
   background-color:#0b1220 !important;
   background-image:none !important;
 }
-#list .q-card, #list .question-card, #list .card {
+
+#list .q-card,
+#list .q-card:hover,
+#list .q-card:focus,
+#list .q-card:focus-within,
+#list .q-card:active,
+#list .q-card.cat-geography,
+#list .q-card.cat-entertainment,
+#list .q-card.cat-history,
+#list .q-card.cat-art-literature,
+#list .q-card.cat-science,
+#list .q-card.cat-sports-leisure,
+#list .q-card.cat-name-year,
+#list .q-card.cat-other {
   background:#111a2b !important;
   color:#f4f7fb !important;
   border-color:#2a3950 !important;
-  box-shadow:0 8px 24px rgba(0,0,0,.18) !important;
+  box-shadow:0 8px 24px rgba(0,0,0,.14) !important;
 }
-#list .q-card:hover, #list .question-card:hover, #list .card:hover {
+
+#list .q-card:hover,
+#list .q-card:focus-within {
   border-color:#3b4e69 !important;
-  box-shadow:0 10px 28px rgba(0,0,0,.24) !important;
+  box-shadow:0 12px 30px rgba(0,0,0,.20) !important;
 }
+
+/* Keep the category identity as a small accent, never a brown card fill. */
 #list .q-card.cat-geography{border-left-color:#38bdf8 !important}
 #list .q-card.cat-entertainment{border-left-color:#c084fc !important}
 #list .q-card.cat-history{border-left-color:#fbbf24 !important}
@@ -927,30 +946,94 @@ html, body, #app, #mainView, #hostView, #adminView {
 #list .q-card.cat-science{border-left-color:#4ade80 !important}
 #list .q-card.cat-sports-leisure{border-left-color:#f87171 !important}
 #list .q-card.cat-name-year{border-left-color:#fb923c !important}
+
+/* Answer and extra-information areas use the same professional theme. */
 #list .q-answer-row {
   background:#172235 !important;
   border:1px solid #314159 !important;
   color:#f4f7fb !important;
 }
-#list .q-answer-content.hidden { display:none !important; }
-#list .q-answer { color:#a7f3c0 !important; }
-#list .q-answer-label { color:#86efac !important; }
+#list .q-answer-content {
+  min-width:0;
+}
+#list .q-answer-content.hidden {
+  display:none !important;
+}
+#list .q-answer {
+  color:#a7f3c0 !important;
+}
+#list .q-answer-label {
+  color:#86efac !important;
+}
 #list .q-info {
   background:#172235 !important;
   border:1px solid #3b4160 !important;
   color:#cbd5e1 !important;
 }
-#list .q-info-label { color:#c4b5fd !important; }
+#list .q-info-label {
+  color:#c4b5fd !important;
+}
+
+/* Make the individual Show/Hide button unambiguous and readable. */
 #list .answer-reveal {
   white-space:nowrap !important;
   flex:0 0 auto !important;
   align-self:start !important;
 }
-#hostView, #adminView { color:#f4f7fb !important; }
-@media (max-width:700px){
-  html,body,#app,#mainView,#hostView,#adminView{background-color:#0b1220 !important;background-image:none !important;}
-  #list .q-card{background:#111a2b !important;}
+#list .answer-reveal:hover,
+#list .answer-reveal:focus {
+  transform:none !important;
 }
+
+/* Host View round tabs — same palette and readable text. */
+#hostView #roundTabs .round-tab,
+#hostView #roundTabs .round-tab:hover,
+#hostView #roundTabs .round-tab:focus,
+#hostView #roundTabs .round-tab:active {
+  background:#172235 !important;
+  color:#f4f7fb !important;
+  border:1px solid #34445c !important;
+  transform:none !important;
+  overflow:hidden !important;
+}
+#hostView #roundTabs .round-tab .cat-name,
+#hostView #roundTabs .round-tab .cat-count {
+  color:#f4f7fb !important;
+}
+#hostView #roundTabs .round-tab .cat-count {
+  color:#b9c7d8 !important;
+}
+#hostView #roundTabs .round-tab.active {
+  background:rgba(244,185,66,.14) !important;
+  border-color:#f4b942 !important;
+  color:#fff !important;
+}
+#hostView #roundTabs .round-tab.active .cat-name,
+#hostView #roundTabs .round-tab.active .cat-count {
+  color:#fff !important;
+}
+
+/* Mobile: explicitly repeat the same surfaces so no legacy media rule can win. */
+@media (max-width:700px) {
+  html,body,#app,#mainView,#hostView,#adminView {
+    background:#0b1220 !important;
+    background-image:none !important;
+  }
+  #list .q-card,
+  #list .q-card:hover,
+  #list .q-card:focus,
+  #list .q-card:focus-within,
+  #list .q-card:active {
+    background:#111a2b !important;
+  }
+  #list .q-answer-row {
+    background:#172235 !important;
+  }
+  #list .q-info {
+    background:#172235 !important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -1099,11 +1182,8 @@ const DEFAULT_STATUSES = ['Draft', 'Ready', 'Used'];
 
 /* ============ STATE ============ */
 const SAVED_PASSWORD = 'dp3612';
-const LIVE_CACHE_KEY = 'cb_live_cache_v1';
-const LIVE_TIMEOUT_MS = 12000;
 let pw = localStorage.getItem('cb_pw') || sessionStorage.getItem('cb_pw') || SAVED_PASSWORD;
 let headers = [], H = {}, categories = [], people = [], rows = [];
-let liveConfirmed = false, liveCacheTime = null;
 let activeCat = '', activeRound = '', busy = false, showAnswers = localStorage.getItem('cb_showAnswers') === 'true';
 let hostSlideIndex = 0, hostSlideRows = [], hostSlideAnswerShown = localStorage.getItem('cb_hostSlideAnswerShown') === 'true';
 
@@ -1131,63 +1211,14 @@ function categoryClass(name) { return 'cat-' + categoryKey(name); }
 
 /* ============ API ============ */
 async function api(action, payload = {}) {
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), LIVE_TIMEOUT_MS);
-  try {
-    const res = await fetch(API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ password: pw, action, ...payload }),
-      signal: controller.signal
-    });
-    if (!res.ok) throw new Error(`Google returned HTTP ${res.status}`);
-    const data = await res.json();
-    if (!data.ok) throw new Error(data.error || 'Request failed');
-    return data;
-  } catch (e) {
-    if (e && e.name === 'AbortError') throw new Error('Live data refresh timed out');
-    throw e;
-  } finally {
-    clearTimeout(timer);
-  }
-}
-
-function setConnection(text, kind) {
-  const el = $('conn');
-  if (!el) return;
-  el.className = 'badge ' + (kind === 'ok' ? 'badge-ok' : kind === 'warn' ? 'badge-warn' : 'badge-err');
-  el.textContent = text;
-}
-function formatSavedTime(ts) {
-  if (!ts) return 'unknown time';
-  try { return new Date(ts).toLocaleString([], { dateStyle:'short', timeStyle:'short' }); }
-  catch (_) { return 'unknown time'; }
-}
-function saveLiveCache() {
-  try {
-    const payload = { savedAt: Date.now(), headers, categories, people, rows };
-    localStorage.setItem(LIVE_CACHE_KEY, JSON.stringify(payload));
-    liveCacheTime = payload.savedAt;
-  } catch (_) {
-    /* Cache is only a safety net; a storage/quota failure must never break live data. */
-  }
-}
-function loadLiveCache() {
-  try {
-    const raw = localStorage.getItem(LIVE_CACHE_KEY);
-    if (!raw) return false;
-    const d = JSON.parse(raw);
-    if (!d || !Array.isArray(d.headers) || !Array.isArray(d.rows)) return false;
-    headers = d.headers; categories = Array.isArray(d.categories) ? d.categories : [];
-    people = Array.isArray(d.people) ? d.people : []; rows = d.rows;
-    H = {}; headers.forEach((h, i) => H[String(h).trim().toLowerCase()] = i);
-    liveCacheTime = Number(d.savedAt) || null;
-    if (activeCat && !categories.includes(activeCat)) activeCat = '';
-    liveConfirmed = false;
-    setConnection(`🟠 LIVE DATA NOT CONFIRMED · Saved ${formatSavedTime(liveCacheTime)}`, 'warn');
-    render();
-    return true;
-  } catch (_) { return false; }
+  const res = await fetch(API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({ password: pw, action, ...payload })
+  });
+  const data = await res.json();
+  if (!data.ok) throw new Error(data.error || 'Request failed');
+  return data;
 }
 
 async function run(fn, okMsg) {
@@ -1199,30 +1230,12 @@ async function run(fn, okMsg) {
 }
 
 async function load() {
-  setConnection('● Checking live data…', 'warn');
-  try {
-    const d = await api('list');
-    headers = d.headers; categories = d.categories; people = d.people; rows = d.rows;
-    H = {}; headers.forEach((h, i) => H[String(h).trim().toLowerCase()] = i);
-    if (activeCat && !categories.includes(activeCat)) activeCat = '';
-    liveConfirmed = true;
-    saveLiveCache();
-    setConnection(`🟢 LIVE · Updated ${formatSavedTime(Date.now())}`, 'ok');
-    render();
-    return true;
-  } catch (e) {
-    liveConfirmed = false;
-    const message = e?.message || 'Live data unavailable';
-    if (/invalid password|incorrect password|password required|authentication failed/i.test(message)) throw e;
-    if (liveCacheTime) {
-      setConnection(`🟠 LIVE DATA NOT CONFIRMED · Saved ${formatSavedTime(liveCacheTime)}`, 'warn');
-      render();
-    } else {
-      setConnection('⚠ LIVE DATA UNAVAILABLE', 'err');
-      $('list').innerHTML = `<div class="empty"><strong>Live data is currently unavailable.</strong><br><span style="font-size:.85rem">The app could not confirm the latest questions from Google. Please try again in a moment.</span></div>`;
-    }
-    throw e;
-  }
+  const d = await api('list');
+  headers = d.headers; categories = d.categories; people = d.people; rows = d.rows;
+  H = {}; headers.forEach((h, i) => H[h.trim().toLowerCase()] = i);
+  if (activeCat && !categories.includes(activeCat)) activeCat = '';
+  $('conn').className = 'badge badge-ok'; $('conn').textContent = '● Connected';
+  render();
 }
 
 function statuses() {
@@ -1241,7 +1254,7 @@ function closeModal() { $('overlay').classList.remove('open'); $('modal').innerH
 
 function lock() {
   pw = ''; sessionStorage.removeItem('cb_pw'); localStorage.removeItem('cb_pw');
-  setConnection('🔒 Password required', 'err');
+  $('conn').className = 'badge badge-err'; $('conn').textContent = '🔒 Locked';
   askPassword();
 }
 function askPassword() {
@@ -1914,17 +1927,7 @@ $('overlay').addEventListener('mousedown', e => { if (e.target === $('overlay') 
   if (!pw) { $('list').innerHTML = ''; return askPassword(); }
   $('answerToggle').textContent = showAnswers ? 'Hide All Answers' : 'Show All Answers';
   $('answerToggle').setAttribute('aria-pressed', showAnswers ? 'true' : 'false');
-  const hadCache = loadLiveCache();
-  try { await load(); }
-  catch (e) {
-    if (/invalid password|incorrect password|password required|authentication failed/i.test(e?.message || '')) {
-      toast(e.message, true); lock();
-    } else if (hadCache) {
-      toast('Google could not confirm live data — showing saved data.', true);
-    } else {
-      toast('Live data is currently unavailable. Please try again.', true);
-    }
-  }
+  try { await load(); } catch (e) { toast(e.message, true); lock(); }
 })();
 </script>
 </body>
