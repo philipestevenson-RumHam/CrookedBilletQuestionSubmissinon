@@ -957,6 +957,7 @@ html, body, #app, #mainView, #hostView, #adminView {
 .share-wrap.nofeed .share-dim,.share-wrap.nofeed .share-soft{display:none}
 .share-check{display:flex;align-items:center;justify-content:center;gap:.5rem;font-size:.8rem;font-weight:700;color:var(--muted);margin-bottom:.8rem;cursor:pointer}
 .share-check input{width:auto;flex:none}
+.q-answer,.q-info{white-space:pre-line}
 </style>
 </head>
 <body>
@@ -1628,7 +1629,7 @@ function questionForm(existing) {
   const f = [];
   if (has('Category')) f.push(`<div class="field"><label>Category</label><div class="category-picker"><select id="qCategory" data-f="Category">${opts(categories, cat, true)}</select><button type="button" class="secondary" id="qAddCat">+ New</button></div></div>`);
   if (has('Question')) f.push(`<div class="field"><label>Question</label><textarea data-f="Question" rows="3">${esc(v('Question'))}</textarea></div>`);
-  if (has('Answer')) f.push(`<div class="field"><label>Answer</label><input data-f="Answer" value="${esc(v('Answer'))}"/></div>`);
+  if (has('Answer')) f.push(`<div class="field"><label>Answer</label><textarea data-f="Answer" rows="2">${esc(v('Answer'))}</textarea></div>`);
   if (has('Extra Information')) f.push(`<div class="field"><label>Extra Information</label><textarea data-f="Extra Information" rows="2">${esc(v('Extra Information'))}</textarea></div>`);
   const row3 = [];
   if (has('Points')) row3.push(`<div class="field"><label>Points</label><input data-f="Points" type="number" min="0" step="1" value="${esc(v('Points'))}"/></div>`);
@@ -1946,6 +1947,11 @@ function shLoadLogo() {
     i.src = SHARE_LOGO;
   });
 }
+function shClean(t) {
+  return String(t == null ? '' : t).trim()
+    .replace(/([,;:.!?])?[ \t]*[\r\n\u2028\u2029\v]+[ \t]*/g, (m, p) => p ? p + ' ' : ', ')
+    .replace(/\s+/g, ' ').trim();
+}
 function shRound(g, x, y, w, h, r) {
   g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r);
   g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath();
@@ -1979,11 +1985,13 @@ function shFit(g, text, weight, maxW, maxH, start, min, lh) {
     size -= 2;
   }
   const maxLines = Math.max(1, Math.floor(maxH / (size * lh)));
+  let cut = false;
   if (lines.length > maxLines) {
+    cut = true;
     lines = lines.slice(0, maxLines);
     lines[maxLines - 1] = lines[maxLines - 1].replace(/\s*\S*$/, '') + '\u2026';
   }
-  return { lines, size };
+  return { lines, size, cut };
 }
 function shChips(g, chips, cy, maxW) {
   const gap = 20; let size = 44, widths;
@@ -2010,10 +2018,19 @@ function shChips(g, chips, cy, maxW) {
 async function drawShareImage(r) {
   try { await Promise.all([document.fonts.load(`900 60px Nunito`), document.fonts.load(`800 60px Nunito`), document.fonts.load(`700 40px Nunito`)]); } catch (e) {}
   const logo = await shLoadLogo();
-  const q = String(get(r, 'Question')).trim(), a = String(get(r, 'Answer')).trim(), ex = String(get(r, 'Extra Information')).trim();
+  const q = shClean(get(r, 'Question')), a = shClean(get(r, 'Answer')), ex = shClean(get(r, 'Extra Information'));
   const cat = String(get(r, 'Category')).trim(), pts = String(get(r, 'Points')).trim(), qn = questionNumberValue(r);
   const col = SH_CAT_COLORS[categoryKey(cat)] || '#f5c800';
-  const W = SHARE_W, H = SHARE_H, bandTop = (H - FEED_BAND_H) / 2, bandBot = bandTop + FEED_BAND_H;
+  const m = document.createElement('canvas').getContext('2d'), tw2 = SHARE_W - 140;
+  let pad = SHARE_PAD, af, ef = null;
+  for (;;) {
+    af = shFit(m, a, 900, tw2, 130 + (pad - SHARE_PAD) * 0.6, 100, 40, 1.2);
+    const exTop = 90 + af.lines.length * af.size * 1.2 + 52 + 14;
+    ef = ex ? shFit(m, ex, 600, tw2, pad - 28 - exTop, 36, 24, 1.3) : null;
+    if ((!af.cut && !(ef && ef.cut)) || pad >= 700) break;
+    pad += 40;
+  }
+  const W = SHARE_W, H = FEED_BAND_H + pad * 2, bandTop = pad, bandBot = bandTop + FEED_BAND_H;
   const safeTop = (H - SAFE_H) / 2, safeBot = safeTop + SAFE_H;
   const c = document.createElement('canvas'); c.width = W; c.height = H;
   const g = c.getContext('2d');
@@ -2073,7 +2090,6 @@ async function drawShareImage(r) {
   const px = 70, pw2 = W - px * 2;
   g.textAlign = 'left'; g.textBaseline = 'alphabetic';
   g.font = `800 32px ${SH_FONT}`; g.fillStyle = '#4ade80'; g.fillText('ANSWER', px, bandBot + 76);
-  const af = shFit(g, a, 900, pw2, 120, 100, 44, 1.2);
   g.font = `900 ${af.size}px ${SH_FONT}`; g.fillStyle = '#f5c800'; g.textBaseline = 'top';
   af.lines.forEach((ln, i) => g.fillText(ln, px, bandBot + 90 + i * af.size * 1.2));
   if (ex) {
@@ -2081,7 +2097,6 @@ async function drawShareImage(r) {
     g.textBaseline = 'alphabetic'; g.font = `800 28px ${SH_FONT}`; g.fillStyle = '#fff8e0';
     g.fillText('DID YOU KNOW?', px, ly);
     const et = ly + 14;
-    const ef = shFit(g, ex, 600, pw2, H - 28 - et, 36, 24, 1.3);
     g.font = `600 ${ef.size}px ${SH_FONT}`; g.fillStyle = '#c9bb7c'; g.textBaseline = 'top';
     ef.lines.forEach((ln, i) => g.fillText(ln, px, et + i * ef.size * 1.3));
   }
@@ -2165,8 +2180,8 @@ async function shareImage(r) {
       <canvas id="shCanvas"></canvas>
       <div class="share-dim top" id="shDimT" style="height:${dimPct}%">Hidden in feed</div>
       <div class="share-dim bot" id="shDimB" style="height:${dimPct}%">Revealed on tap</div>
-      <div class="share-soft" style="top:${dimPct}%;height:${softPct}%"></div>
-      <div class="share-soft" style="bottom:${dimPct}%;height:${softPct}%"></div>
+      <div class="share-soft" id="shSoftT" style="top:${dimPct}%;height:${softPct}%"></div>
+      <div class="share-soft" id="shSoftB" style="bottom:${dimPct}%;height:${softPct}%"></div>
     </div>
     <label class="share-check"><input type="checkbox" id="shFeed" checked/> Show feed crop</label>
     <div class="btn-row"><button id="shDl" style="flex:1">Download PNG</button><button id="shCopy" class="secondary" style="flex:1">Copy image</button></div>
@@ -2177,7 +2192,12 @@ async function shareImage(r) {
   const c = await drawShareImage(r);
   shareCanvas = c;
   const view = $('shCanvas'); if (!view) return;
-  view.width = SHARE_W / 2; view.height = SHARE_H / 2;
+  const dp = ((c.height - FEED_BAND_H) / 2) / c.height * 100, sp = ((FEED_BAND_H - SAFE_H) / 2) / c.height * 100;
+  $('shWrap').style.aspectRatio = c.width + '/' + c.height;
+  $('shDimT').style.height = $('shDimB').style.height = dp + '%';
+  $('shSoftT').style.top = $('shSoftB').style.bottom = dp + '%';
+  $('shSoftT').style.height = $('shSoftB').style.height = sp + '%';
+  view.width = c.width / 2; view.height = c.height / 2;
   view.getContext('2d').drawImage(c, 0, 0, view.width, view.height);
   const fname = 'rumham-quiz-' + (String(questionNumberValue(r) || get(r, 'ID') || 'question').replace(/[^a-z0-9_-]+/gi, '-')) + '.png';
   $('shDl').onclick = async () => {
