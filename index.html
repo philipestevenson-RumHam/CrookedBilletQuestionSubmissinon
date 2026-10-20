@@ -2015,10 +2015,84 @@ function shChips(g, chips, cy, maxW) {
   });
 }
 
+
+/* ---- multiple-choice options -> pills ---- */
+function shParseOptions(raw) {
+  const text = String(raw == null ? '' : raw).replace(/\r/g, '').trim();
+  const mark = /^\s*([a-fA-F]|[1-6])\s*[.)]\s*(.+?)\s*$/;
+  const lines = text.split('\n');
+  let k = lines.length; const opts = [];
+  while (k > 0) {
+    const m = lines[k - 1].match(mark);
+    if (!m) break;
+    opts.unshift({ label: m[1].toUpperCase(), text: m[2] }); k--;
+  }
+  if (opts.length >= 2 && opts.length <= 6 && k > 0) return { stem: lines.slice(0, k).join('\n').trim(), options: opts };
+  // options all on one line: "a. Food, b. Juice, c. Dog"
+  const flat = text.replace(/\s*\n\s*/g, ' ');
+  const re = /(?:^|[\s,;(])([a-fA-F]|[1-6])\.\s+/g, marks = [];
+  let m;
+  while ((m = re.exec(flat))) {
+    const lead = m[0].length - m[0].replace(/^[\s,;(]+/, '').length;
+    marks.push({ label: m[1].toUpperCase(), start: m.index + lead, end: m.index + m[0].length });
+  }
+  const val = l => /\d/.test(l) ? parseInt(l, 10) : l.charCodeAt(0) - 64;
+  let first = marks.findIndex(x => val(x.label) === 1);
+  if (first < 0) return null;
+  const chain = [marks[first]];
+  for (let i = first + 1; i < marks.length; i++) {
+    const prev = chain[chain.length - 1];
+    if (/\d/.test(marks[i].label) === /\d/.test(prev.label) && val(marks[i].label) > val(prev.label)) chain.push(marks[i]);
+  }
+  if (chain.length < 2 || chain.length > 6) return null;
+  const stem = flat.slice(0, chain[0].start).trim();
+  if (!stem) return null;
+  const options = chain.map((c, i) => ({
+    label: c.label,
+    text: flat.slice(c.end, i + 1 < chain.length ? chain[i + 1].start : flat.length).replace(/[\s,;]+$/, '').trim()
+  })).filter(o => o.text);
+  return options.length >= 2 ? { stem, options } : null;
+}
+function shPills(g, options, maxW, maxH) {
+  const n = options.length, gap = 16;
+  for (let size = 46; size >= 34; size -= 2) {
+    const h = Math.round(size * 2), d = Math.round(h * 0.62), padL = (h - d) / 2, padR = h * 0.5, last = size <= 34;
+    const height = n * h + (n - 1) * gap;
+    if (height > maxH && !last) continue;
+    g.font = `800 ${size}px ${SH_FONT}`;
+    const room = maxW - padL - d - 18 - padR;
+    const items = options.map(o => {
+      let t = o.text;
+      if (g.measureText(t).width > room) {
+        while (t.length > 1 && g.measureText(t + '\u2026').width > room) t = t.slice(0, -1);
+        t = t.trimEnd() + '\u2026';
+      }
+      return { label: o.label, text: t, tw: g.measureText(t).width };
+    });
+    const natural = Math.max(...items.map(it => padL + d + 18 + it.tw + padR));
+    return { items, size, h, d, padL, gap, height, w: Math.min(maxW, Math.max(natural, 560)) };
+  }
+}
+function shDrawPills(g, pills, y) {
+  const { items, size, h, d, padL, gap, w } = pills, x = (SHARE_W - w) / 2;
+  items.forEach((it, i) => {
+    const cy = y + i * (h + gap) + h / 2;
+    shRound(g, x, cy - h / 2, w, h, h / 2);
+    g.fillStyle = 'rgba(245,200,0,.14)'; g.fill(); g.lineWidth = 4; g.strokeStyle = '#f5c800'; g.stroke();
+    g.beginPath(); g.arc(x + padL + d / 2, cy, d / 2, 0, Math.PI * 2); g.fillStyle = '#f5c800'; g.fill();
+    g.textBaseline = 'middle'; g.textAlign = 'center'; g.fillStyle = '#0d0b00'; g.font = `900 ${Math.round(size * 0.85)}px ${SH_FONT}`;
+    g.fillText(it.label, x + padL + d / 2, cy + 2);
+    g.textAlign = 'left'; g.fillStyle = '#fff8e0'; g.font = `800 ${size}px ${SH_FONT}`;
+    g.fillText(it.text, x + padL + d + 18, cy + 2);
+  });
+}
+
 async function drawShareImage(r) {
   try { await Promise.all([document.fonts.load(`900 60px Nunito`), document.fonts.load(`800 60px Nunito`), document.fonts.load(`700 40px Nunito`)]); } catch (e) {}
   const logo = await shLoadLogo();
-  const q = shClean(get(r, 'Question')), a = shClean(get(r, 'Answer')), ex = shClean(get(r, 'Extra Information'));
+  const parsed = shParseOptions(get(r, 'Question'));
+  const q = shClean(parsed ? parsed.stem : get(r, 'Question')), opts = parsed ? parsed.options : null;
+  const a = shClean(get(r, 'Answer')), ex = shClean(get(r, 'Extra Information'));
   const cat = String(get(r, 'Category')).trim(), pts = String(get(r, 'Points')).trim(), qn = questionNumberValue(r);
   const col = SH_CAT_COLORS[categoryKey(cat)] || '#f5c800';
   const m = document.createElement('canvas').getContext('2d'), tw2 = SHARE_W - 140;
@@ -2075,11 +2149,14 @@ async function drawShareImage(r) {
   g.fillText('QUESTION', W / 2, ry + rh / 2 + 3);
 
   const qTop = safeTop + 440, qBot = safeBot - 190;
-  const qf = shFit(g, q, 800, W - 180, qBot - qTop, 96, 44, 1.25);
-  const qh = qf.lines.length * qf.size * 1.25;
+  const pills = opts ? shPills(g, opts, W - 240, 500) : null, gapQ = pills ? 36 : 0;
+  const qf = shFit(g, q, 800, W - 180, qBot - qTop - (pills ? pills.height + gapQ : 0), 96, 44, 1.25);
+  const qh = qf.lines.length * qf.size * 1.25, blockH = qh + (pills ? gapQ + pills.height : 0);
+  const y0 = qTop + (qBot - qTop - blockH) / 2;
   g.fillStyle = '#fff8e0'; g.textAlign = 'center'; g.textBaseline = 'top';
   g.font = `800 ${qf.size}px ${SH_FONT}`;
-  qf.lines.forEach((ln, i) => g.fillText(ln, W / 2, qTop + (qBot - qTop - qh) / 2 + i * qf.size * 1.25));
+  qf.lines.forEach((ln, i) => g.fillText(ln, W / 2, y0 + i * qf.size * 1.25));
+  if (pills) shDrawPills(g, pills, y0 + qh + gapQ);
 
   g.font = `700 42px ${SH_FONT}`; g.fillStyle = '#a89a60'; g.textBaseline = 'middle';
   g.fillText('Tap the image to reveal the answer \u2193', W / 2, safeBot - 90);
