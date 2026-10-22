@@ -1964,24 +1964,22 @@ function shWrap(g, text, maxW) {
       const t = line ? line + ' ' + w : w;
       if (g.measureText(t).width <= maxW) { line = t; return; }
       if (line) { out.push(line); line = ''; }
-      let word = w;
-      while (g.measureText(word).width > maxW && word.length > 1) {
-        let k = word.length;
-        while (k > 1 && g.measureText(word.slice(0, k)).width > maxW) k--;
-        out.push(word.slice(0, k)); word = word.slice(k);
-      }
-      line = word;
+      // Keep each word intact: never split a word across two image lines.
+      // A single unusually long word is kept whole rather than broken into fragments.
+      line = w;
     });
     out.push(line);
   });
   return out;
 }
-function shFit(g, text, weight, maxW, maxH, start, min, lh) {
+function shFit(g, text, weight, maxW, maxH, start, min, lh, balance) {
   let size = start, lines;
   for (;;) {
     g.font = `${weight} ${size}px ${SH_FONT}`;
     lines = shWrap(g, text, maxW);
-    if (lines.length * size * lh <= maxH || size <= min) break;
+    const longestWord = String(text).split(/\s+/).reduce((best, word) =>
+      Math.max(best, g.measureText(word).width), 0);
+    if ((lines.length * size * lh <= maxH && longestWord <= maxW) || size <= min) break;
     size -= 2;
   }
   const maxLines = Math.max(1, Math.floor(maxH / (size * lh)));
@@ -1991,28 +1989,68 @@ function shFit(g, text, weight, maxW, maxH, start, min, lh) {
     lines = lines.slice(0, maxLines);
     lines[maxLines - 1] = lines[maxLines - 1].replace(/\s*\S*$/, '') + '\u2026';
   }
+  if (balance && !cut && lines.length > 1) {
+    /* narrowest width that keeps the same line count -> evenly filled lines, no orphan last word */
+    const n = lines.length; let lo = maxW * 0.45, hi = maxW;
+    for (let i = 0; i < 14; i++) { const mid = (lo + hi) / 2; if (shWrap(g, text, mid).length <= n) hi = mid; else lo = mid; }
+    const bl = shWrap(g, text, hi); if (bl.length === n) lines = bl;
+  }
   return { lines, size, cut };
 }
-function shChips(g, chips, cy, maxW) {
-  const gap = 20; let size = 44, widths;
-  for (;;) {
-    g.font = `800 ${size}px ${SH_FONT}`;
-    widths = chips.map(c => g.measureText(c.text).width + size * 1.6);
-    const tall = chips.length * size * 2 + (chips.length - 1) * gap;
-    if ((Math.max(...widths) <= maxW && tall <= cy * 2 - 40) || size <= 28) break;
-    size -= 2;
+/* letter-spaced text helpers (manual tracking so it works in every browser) */
+function shSpacedW(g, text, sp) {
+  const chars = Array.from(text);
+  return chars.reduce((a, ch) => a + g.measureText(ch).width, 0) + sp * Math.max(0, chars.length - 1);
+}
+function shSpaced(g, text, x, y, sp, align) {
+  const chars = Array.from(text), ws = chars.map(ch => g.measureText(ch).width);
+  const total = ws.reduce((a, b) => a + b, 0) + sp * Math.max(0, chars.length - 1);
+  let cx = align === 'center' ? x - total / 2 : x;
+  const prev = g.textAlign; g.textAlign = 'left';
+  chars.forEach((ch, i) => { g.fillText(ch, cx, y); cx += ws[i] + sp; });
+  g.textAlign = prev;
+  return total;
+}
+/* hidden top area: line 1 = letter-spaced "ROUND n · QUESTION n", line 2 = category + points pills */
+function shTop(g, label, pills, cy, maxW) {
+  let ls = 60, ps = 46, pw;
+  const gapY = 40, gapX = 22;
+  if (label) {
+    for (;;) {
+      g.font = `900 ${ls}px ${SH_FONT}`;
+      if (shSpacedW(g, label, ls * 0.14) <= maxW || ls <= 30) break;
+      ls -= 2;
+    }
   }
-  const h = size * 2, total = chips.length * h + (chips.length - 1) * gap;
-  let y = cy - total / 2 + h / 2;
-  g.textBaseline = 'middle'; g.textAlign = 'center';
-  chips.forEach((c, i) => {
-    const x = (SHARE_W - widths[i]) / 2;
-    shRound(g, x, y - h / 2, widths[i], h, h / 2);
-    g.fillStyle = c.bg; g.fill();
-    if (c.border) { g.lineWidth = 4; g.strokeStyle = c.border; g.stroke(); }
-    g.fillStyle = c.color; g.fillText(c.text, SHARE_W / 2, y + 2);
-    y += h + gap;
-  });
+  for (;;) {
+    g.font = `800 ${ps}px ${SH_FONT}`;
+    pw = pills.map(c => g.measureText(c.text).width + ps * 1.6);
+    const row = pw.reduce((a, b) => a + b, 0) + gapX * Math.max(0, pills.length - 1);
+    if (row <= maxW || ps <= 26) break;
+    ps -= 2;
+  }
+  const labelH = label ? ls : 0, pillH = pills.length ? ps * 1.9 : 0;
+  const gap = label && pills.length ? gapY : 0, total = labelH + gap + pillH;
+  let y = cy - total / 2;
+  g.textBaseline = 'middle';
+  if (label) {
+    g.font = `900 ${ls}px ${SH_FONT}`; g.fillStyle = '#f5c800';
+    shSpaced(g, label, SHARE_W / 2, y + ls / 2 + 2, ls * 0.14, 'center');
+    y += labelH + gap;
+  }
+  if (pills.length) {
+    const row = pw.reduce((a, b) => a + b, 0) + gapX * (pills.length - 1);
+    let x = (SHARE_W - row) / 2; const cyp = y + pillH / 2;
+    g.textAlign = 'center';
+    pills.forEach((c, i) => {
+      shRound(g, x, y, pw[i], pillH, pillH / 2);
+      g.fillStyle = c.bg; g.fill();
+      if (c.border) { g.lineWidth = 4; g.strokeStyle = c.border; g.stroke(); }
+      g.fillStyle = c.color; g.font = `800 ${ps}px ${SH_FONT}`;
+      g.fillText(c.text, x + pw[i] / 2, cyp + 2);
+      x += pw[i] + gapX;
+    });
+  }
 }
 
 
@@ -2088,20 +2126,29 @@ function shDrawPills(g, pills, y) {
 }
 
 async function drawShareImage(r) {
-  try { await Promise.all([document.fonts.load(`900 60px Nunito`), document.fonts.load(`800 60px Nunito`), document.fonts.load(`700 40px Nunito`)]); } catch (e) {}
+  try { await Promise.all([document.fonts.load(`900 60px Nunito`), document.fonts.load(`800 60px Nunito`), document.fonts.load(`700 40px Nunito`), document.fonts.load(`600 30px Nunito`)]); } catch (e) {}
   const logo = await shLoadLogo();
   const parsed = shParseOptions(get(r, 'Question'));
   const q = shClean(parsed ? parsed.stem : get(r, 'Question')), opts = parsed ? parsed.options : null;
   const a = shClean(get(r, 'Answer')), ex = shClean(get(r, 'Extra Information'));
   const cat = String(get(r, 'Category')).trim(), pts = String(get(r, 'Points')).trim(), qn = questionNumberValue(r);
   const col = SH_CAT_COLORS[categoryKey(cat)] || '#f5c800';
-  const m = document.createElement('canvas').getContext('2d'), tw2 = SHARE_W - 140;
+  const rdRaw = roundValue(r);
+  const rdText = rdRaw ? (/^\d+[a-z]?$/i.test(rdRaw) ? 'Round ' + rdRaw : rdRaw) : '';
+  const qnText = qn ? (/^\d+[a-z]?$/i.test(qn) ? 'Question ' + qn : qn) : '';
+
+  /* answer card geometry (bottom, revealed on tap) */
+  const m = document.createElement('canvas').getContext('2d');
+  const CARD_X = 50, CARD_W = SHARE_W - 100, TX = CARD_X + 52, TW = CARD_W - 52 - 44;
   let pad = SHARE_PAD, af, ef = null;
   for (;;) {
-    af = shFit(m, a, 900, tw2, 130 + (pad - SHARE_PAD) * 0.6, 100, 40, 1.2);
-    const exTop = 90 + af.lines.length * af.size * 1.2 + 52 + 14;
-    ef = ex ? shFit(m, ex, 600, tw2, pad - 28 - exTop, 36, 24, 1.3) : null;
-    if ((!af.cut && !(ef && ef.cut)) || pad >= 700) break;
+    const cardH = pad - 72;
+    af = shFit(m, a, 900, TW, 130 + (pad - SHARE_PAD) * 0.6, 100, 40, 1.2);
+    const afh = af.lines.length * af.size * 1.2;
+    const efAvail = cardH - 56 - (52 + afh + 56 + 16);
+    ef = ex ? shFit(m, ex, 600, TW, efAvail, 36, 24, 1.3) : null;
+    const over = ef && ef.lines.length * ef.size * 1.3 > efAvail + 1;
+    if ((!af.cut && !(ef && ef.cut) && !over) || pad >= 700) break;
     pad += 40;
   }
   const W = SHARE_W, H = FEED_BAND_H + pad * 2, bandTop = pad, bandBot = bandTop + FEED_BAND_H;
@@ -2109,73 +2156,112 @@ async function drawShareImage(r) {
   const c = document.createElement('canvas'); c.width = W; c.height = H;
   const g = c.getContext('2d');
 
+  /* background: hidden areas, feed band, soft glow, frame around the safe area */
   g.fillStyle = '#1a1400'; g.fillRect(0, 0, W, H);
   g.fillStyle = '#221c00'; g.fillRect(0, bandTop, W, FEED_BAND_H);
+  const gy = bandTop + FEED_BAND_H * 0.42;
+  const gl = g.createRadialGradient(W / 2, gy, 60, W / 2, gy, 980);
+  gl.addColorStop(0, 'rgba(245,200,0,.13)'); gl.addColorStop(1, 'rgba(245,200,0,0)');
+  g.fillStyle = gl; g.fillRect(0, bandTop, W, FEED_BAND_H);
+  shRound(g, 24, safeTop + 24, W - 48, SAFE_H - 48, 36);
+  g.lineWidth = 3; g.strokeStyle = 'rgba(245,200,0,.30)'; g.stroke();
 
-  g.save(); g.beginPath(); g.rect(0, bandTop, W, FEED_BAND_H); g.clip();
-  g.fillStyle = 'rgba(245,200,0,.06)'; g.textAlign = 'left'; g.textBaseline = 'alphabetic';
-  g.font = `900 520px ${SH_FONT}`; g.fillText('?', -50, bandTop + 470); g.fillText('?', W - 400, bandBot + 40);
-  g.font = `900 220px ${SH_FONT}`; g.fillText('?', W - 280, bandTop + 760); g.fillText('?', 30, bandBot - 220);
-  g.restore();
-
-  const chips = [];
-  if (cat) chips.push({ text: cat, bg: col + '2e', color: col });
-  if (qn) chips.push({ text: 'Question ' + qn, bg: 'rgba(245,200,0,.14)', color: '#f5c800' });
-  if (pts) chips.push({ text: pts + (pts === '1' ? ' pt' : ' pts'), bg: 'transparent', color: '#f5c800', border: '#f5c800' });
-  if (chips.length) shChips(g, chips, bandTop / 2, W - 120);
+  /* hidden top: line 1 round + question number, line 2 category + points */
+  const topPills = [];
+  if (cat) topPills.push({ text: cat, bg: col + '2e', color: col });
+  if (pts) topPills.push({ text: pts + (pts === '1' ? ' pt' : ' pts'), bg: 'transparent', color: '#f5c800', border: '#f5c800' });
+  shTop(g, [rdText, qnText].filter(Boolean).join('  \u00b7  ').toUpperCase(), topPills, bandTop / 2, W - 120);
 
   g.fillStyle = '#f5c800'; g.fillRect(0, bandTop - 3, W, 6);
 
-  const hy = safeTop + 50, lh = 190;
+  /* feed: compact header + gold rule */
+  const hy = safeTop + 80, lh = 110;
   const lw = logo ? lh * (logo.width / logo.height) : 0;
-  let ts = 100, tw, total;
+  let ts = 72, tw, total;
   for (;;) {
     g.font = `900 ${ts}px ${SH_FONT}`;
     tw = g.measureText(SHARE_TITLE).width;
-    total = lw + (logo ? 40 : 0) + tw;
-    if (total <= W - 140 || ts <= 56) break;
+    total = lw + (logo ? 28 : 0) + tw;
+    if (total <= W - 200 || ts <= 44) break;
     ts -= 2;
   }
   let hx = (W - total) / 2;
-  if (logo) { g.drawImage(logo, hx, hy, lw, lh); hx += lw + 40; }
+  if (logo) { g.drawImage(logo, hx, hy, lw, lh); hx += lw + 28; }
   g.textAlign = 'left'; g.textBaseline = 'middle'; g.fillStyle = '#f5c800';
-  g.fillText(SHARE_TITLE, hx, hy + lh / 2 + 6);
+  g.fillText(SHARE_TITLE, hx, hy + lh / 2 + 4);
 
-  g.fillStyle = '#4a3c00'; g.fillRect(90, safeTop + 280, W - 180, 4);
+  const ruleY = hy + lh + 36;
+  const rg = g.createLinearGradient(90, 0, W - 90, 0);
+  rg.addColorStop(0, 'rgba(245,200,0,0)'); rg.addColorStop(.5, '#f5c800'); rg.addColorStop(1, 'rgba(245,200,0,0)');
+  g.fillStyle = rg; g.fillRect(90, ruleY, W - 180, 3);
 
-  const rw = 330, rh = 84, ry = safeTop + 320;
-  shRound(g, (W - rw) / 2, ry, rw, rh, 12); g.fillStyle = '#f5c800'; g.fill();
-  g.font = `900 46px ${SH_FONT}`; g.fillStyle = '#0d0b00'; g.textAlign = 'center'; g.textBaseline = 'middle';
-  g.fillText('QUESTION', W / 2, ry + rh / 2 + 3);
+  /* feed: category badge (replaces the old QUESTION badge) */
+  let nextY = ruleY + 3;
+  if (cat) {
+    const catUp = cat.toUpperCase();
+    let bsz = 38, bw;
+    for (;;) {
+      g.font = `900 ${bsz}px ${SH_FONT}`;
+      bw = shSpacedW(g, catUp, bsz * 0.13) + 90;
+      if (bw <= W - 200 || bsz <= 24) break;
+      bsz -= 2;
+    }
+    const bh = 76, by = ruleY + 40;
+    shRound(g, (W - bw) / 2, by, bw, bh, bh / 2); g.fillStyle = col; g.fill();
+    g.fillStyle = '#0d0b00'; g.textBaseline = 'middle';
+    shSpaced(g, catUp, W / 2, by + bh / 2 + 2, bsz * 0.13, 'center');
+    nextY = by + bh;
+  }
 
-  const qTop = safeTop + 440, qBot = safeBot - 190;
+  /* feed: question (balanced lines) + optional option pills */
+  const QLH = 1.32;
+  const qTop = nextY + 50, qBot = safeBot - 180;
   const pills = opts ? shPills(g, opts, W - 240, 500) : null, gapQ = pills ? 36 : 0;
-  const qf = shFit(g, q, 800, W - 180, qBot - qTop - (pills ? pills.height + gapQ : 0), 96, 44, 1.25);
-  const qh = qf.lines.length * qf.size * 1.25, blockH = qh + (pills ? gapQ + pills.height : 0);
+  const qf = shFit(g, q, 800, W - 180, qBot - qTop - (pills ? pills.height + gapQ : 0), 96, 44, QLH, true);
+  const qh = qf.lines.length * qf.size * QLH, blockH = qh + (pills ? gapQ + pills.height : 0);
   const y0 = qTop + (qBot - qTop - blockH) / 2;
   g.fillStyle = '#fff8e0'; g.textAlign = 'center'; g.textBaseline = 'top';
   g.font = `800 ${qf.size}px ${SH_FONT}`;
-  qf.lines.forEach((ln, i) => g.fillText(ln, W / 2, y0 + i * qf.size * 1.25));
+  qf.lines.forEach((ln, i) => g.fillText(ln, W / 2, y0 + i * qf.size * QLH));
   if (pills) shDrawPills(g, pills, y0 + qh + gapQ);
 
-  g.font = `700 42px ${SH_FONT}`; g.fillStyle = '#a89a60'; g.textBaseline = 'middle';
-  g.fillText('Tap the image to reveal the answer \u2193', W / 2, safeBot - 90);
+  /* feed: tap prompt as an outlined pill with a chevron */
+  const ph = 84, pcy = safeBot - 100, ptxt = 'Tap the image to reveal the answer';
+  g.font = `700 38px ${SH_FONT}`;
+  const ptw = g.measureText(ptxt).width, pww = ptw + 28 + 26 + 100, pxx = (W - pww) / 2;
+  shRound(g, pxx, pcy - ph / 2, pww, ph, ph / 2);
+  g.fillStyle = 'rgba(245,200,0,.08)'; g.fill(); g.lineWidth = 3; g.strokeStyle = 'rgba(245,200,0,.55)'; g.stroke();
+  g.fillStyle = '#e8d98a'; g.textAlign = 'left'; g.textBaseline = 'middle';
+  g.fillText(ptxt, pxx + 50, pcy + 2);
+  const chx = pxx + 50 + ptw + 28 + 13;
+  g.beginPath(); g.moveTo(chx - 13, pcy - 6); g.lineTo(chx, pcy + 8); g.lineTo(chx + 13, pcy - 6);
+  g.lineWidth = 5; g.lineCap = 'round'; g.lineJoin = 'round'; g.strokeStyle = '#f5c800'; g.stroke();
 
   g.save(); g.setLineDash([26, 18]); g.strokeStyle = '#4a3c00'; g.lineWidth = 5;
   g.beginPath(); g.moveTo(0, bandBot + 2); g.lineTo(W, bandBot + 2); g.stroke(); g.restore();
 
-  const px = 70, pw2 = W - px * 2;
+  /* hidden bottom: answer card with green accent bar */
+  const cardY = bandBot + 36, cardH = pad - 72;
+  shRound(g, CARD_X, cardY, CARD_W, cardH, 28);
+  g.fillStyle = 'rgba(255,248,224,.06)'; g.fill(); g.lineWidth = 2; g.strokeStyle = 'rgba(245,200,0,.18)'; g.stroke();
+  g.save(); shRound(g, CARD_X, cardY, CARD_W, cardH, 28); g.clip();
+  g.fillStyle = '#4ade80'; g.fillRect(CARD_X, cardY, 12, cardH); g.restore();
+
+  const afh = af.lines.length * af.size * 1.2, efh = ef ? ef.lines.length * ef.size * 1.3 : 0;
+  const contentH = 52 + afh + (ex ? 56 + 16 + efh : 0);
+  const top = cardY + Math.max(28, (cardH - contentH) / 2), ansTop = top + 52;
   g.textAlign = 'left'; g.textBaseline = 'alphabetic';
-  g.font = `800 32px ${SH_FONT}`; g.fillStyle = '#4ade80'; g.fillText('ANSWER', px, bandBot + 76);
+  g.font = `800 30px ${SH_FONT}`; g.fillStyle = '#4ade80'; shSpaced(g, 'ANSWER', TX, top + 28, 4, 'left');
   g.font = `900 ${af.size}px ${SH_FONT}`; g.fillStyle = '#f5c800'; g.textBaseline = 'top';
-  af.lines.forEach((ln, i) => g.fillText(ln, px, bandBot + 90 + i * af.size * 1.2));
+  af.lines.forEach((ln, i) => g.fillText(ln, TX, ansTop + i * af.size * 1.2));
   if (ex) {
-    const ly = bandBot + 90 + af.lines.length * af.size * 1.2 + 52;
-    g.textBaseline = 'alphabetic'; g.font = `800 28px ${SH_FONT}`; g.fillStyle = '#fff8e0';
-    g.fillText('DID YOU KNOW?', px, ly);
-    const et = ly + 14;
+    const ry = ansTop + afh + 16;
+    g.fillStyle = 'rgba(245,200,0,.2)'; g.fillRect(TX, ry, TW, 2);
+    g.textBaseline = 'alphabetic'; g.font = `800 26px ${SH_FONT}`; g.fillStyle = '#fff8e0';
+    shSpaced(g, 'DID YOU KNOW?', TX, ry + 14 + 26, 3, 'left');
+    const et = ry + 14 + 26 + 16;
     g.font = `600 ${ef.size}px ${SH_FONT}`; g.fillStyle = '#c9bb7c'; g.textBaseline = 'top';
-    ef.lines.forEach((ln, i) => g.fillText(ln, px, et + i * ef.size * 1.3));
+    ef.lines.forEach((ln, i) => g.fillText(ln, TX, et + i * ef.size * 1.3));
   }
   return c;
 }
