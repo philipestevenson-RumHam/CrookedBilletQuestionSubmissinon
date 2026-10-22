@@ -1932,7 +1932,7 @@ const SHARE_CAPTION = 'Can you get it? \uD83E\uDD14 Tap the image to reveal the 
 const SHARE_W = 1080;
 const FEED_BAND_H = 1620; /* part of the image the desktop feed shows (2:3), centred. Measured from a real post. */
 const SAFE_H = 1350;      /* 4:5 centre area: question content stays inside this in case phones crop tighter */
-const SHARE_PAD = 405;    /* hidden space above and below the feed area (chips on top, answer below) */
+const SHARE_PAD = 445;    /* hidden space above and below the feed area (chips on top, answer below). Fixed so every export is the same size (1080x2510). */
 const SHARE_H = FEED_BAND_H + SHARE_PAD * 2;
 const SH_FONT = 'Nunito, system-ui, sans-serif';
 const SH_CAT_COLORS = {geography:'#38bdf8',entertainment:'#c084fc',history:'#fbbf24','art-literature':'#f472b6',science:'#4ade80','sports-leisure':'#f87171','name-year':'#fb923c',other:'#f5c800'};
@@ -1964,8 +1964,8 @@ function shWrap(g, text, maxW) {
       const t = line ? line + ' ' + w : w;
       if (g.measureText(t).width <= maxW) { line = t; return; }
       if (line) { out.push(line); line = ''; }
-      // Keep each word intact: never split a word across two image lines.
-      // A single unusually long word is kept whole rather than broken into fragments.
+      // Never split a word across lines. If a single word is too wide,
+      // keep it intact; shFit will reduce the font size until it fits.
       line = w;
     });
     out.push(line);
@@ -1977,9 +1977,8 @@ function shFit(g, text, weight, maxW, maxH, start, min, lh, balance) {
   for (;;) {
     g.font = `${weight} ${size}px ${SH_FONT}`;
     lines = shWrap(g, text, maxW);
-    const longestWord = String(text).split(/\s+/).reduce((best, word) =>
-      Math.max(best, g.measureText(word).width), 0);
-    if ((lines.length * size * lh <= maxH && longestWord <= maxW) || size <= min) break;
+    const tooWide = lines.some(line => g.measureText(line).width > maxW);
+    if ((!tooWide && lines.length * size * lh <= maxH) || size <= 12) break;
     size -= 2;
   }
   const maxLines = Math.max(1, Math.floor(maxH / (size * lh)));
@@ -1987,7 +1986,7 @@ function shFit(g, text, weight, maxW, maxH, start, min, lh, balance) {
   if (lines.length > maxLines) {
     cut = true;
     lines = lines.slice(0, maxLines);
-    lines[maxLines - 1] = lines[maxLines - 1].replace(/\s*\S*$/, '') + '\u2026';
+    lines[maxLines - 1] = lines[maxLines - 1].replace(/\s+\S*$/, '') + '\u2026';
   }
   if (balance && !cut && lines.length > 1) {
     /* narrowest width that keeps the same line count -> evenly filled lines, no orphan last word */
@@ -2125,6 +2124,27 @@ function shDrawPills(g, pills, y) {
   });
 }
 
+/* RumHam comic theme: high-contrast graphic treatment inspired by approved mock-up. */
+function shBurst(g, x, y, scale, color, count=3, angle=-0.45) {
+  g.save(); g.strokeStyle=color; g.lineWidth=8*scale; g.lineCap='round';
+  for(let i=0;i<count;i++){ const a=angle+(i-(count-1)/2)*0.48;
+    g.beginPath(); g.moveTo(x+Math.cos(a)*18*scale,y+Math.sin(a)*18*scale);
+    g.lineTo(x+Math.cos(a)*48*scale,y+Math.sin(a)*48*scale); g.stroke(); }
+  g.restore();
+}
+function shStar(g,x,y,r,color){
+  g.save(); g.beginPath(); for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5, rr=i%2?r*.43:r; const px=x+Math.cos(a)*rr,py=y+Math.sin(a)*rr; i?g.lineTo(px,py):g.moveTo(px,py);} g.closePath(); g.fillStyle=color; g.fill(); g.restore();
+}
+function shQuestionDoodle(g,x,y,size,color,rotation=0){
+  g.save(); g.translate(x,y); g.rotate(rotation); g.textAlign='center';g.textBaseline='middle';
+  g.font=`900 ${size}px ${SH_FONT}`; g.lineJoin='round';g.lineWidth=8;g.strokeStyle='#050505';g.strokeText('?',0,0);g.fillStyle=color;g.fillText('?',0,0);g.restore();
+}
+function shBrush(g,x,y,len,color,rotation=-0.45){
+  g.save();g.translate(x,y);g.rotate(rotation);g.fillStyle=color;
+  g.beginPath();g.moveTo(-len/2,0);g.lineTo(len/2,0);g.lineTo(len/2-24,10);g.lineTo(len/2-75,6);g.lineTo(-len/2+28,16);g.closePath();g.fill();
+  g.strokeStyle=color;g.lineWidth=4;g.lineCap='round';
+  for(let i=0;i<4;i++){g.beginPath();g.moveTo(-len/2+i*20,20+i*3);g.lineTo(len/2-60-i*12,14+i*3);g.stroke();}g.restore();
+}
 async function drawShareImage(r) {
   try { await Promise.all([document.fonts.load(`900 60px Nunito`), document.fonts.load(`800 60px Nunito`), document.fonts.load(`700 40px Nunito`), document.fonts.load(`600 30px Nunito`)]); } catch (e) {}
   const logo = await shLoadLogo();
@@ -2148,7 +2168,7 @@ async function drawShareImage(r) {
     const efAvail = cardH - 56 - (52 + afh + 56 + 16);
     ef = ex ? shFit(m, ex, 600, TW, efAvail, 36, 24, 1.3) : null;
     const over = ef && ef.lines.length * ef.size * 1.3 > efAvail + 1;
-    if ((!af.cut && !(ef && ef.cut) && !over) || pad >= 700) break;
+    if ((!af.cut && !(ef && ef.cut) && !over) || pad >= SHARE_PAD) break; /* fixed height: no growing */
     pad += 40;
   }
   const W = SHARE_W, H = FEED_BAND_H + pad * 2, bandTop = pad, bandBot = bandTop + FEED_BAND_H;
@@ -2156,15 +2176,33 @@ async function drawShareImage(r) {
   const c = document.createElement('canvas'); c.width = W; c.height = H;
   const g = c.getContext('2d');
 
-  /* background: hidden areas, feed band, soft glow, frame around the safe area */
-  g.fillStyle = '#1a1400'; g.fillRect(0, 0, W, H);
-  g.fillStyle = '#221c00'; g.fillRect(0, bandTop, W, FEED_BAND_H);
-  const gy = bandTop + FEED_BAND_H * 0.42;
-  const gl = g.createRadialGradient(W / 2, gy, 60, W / 2, gy, 980);
-  gl.addColorStop(0, 'rgba(245,200,0,.13)'); gl.addColorStop(1, 'rgba(245,200,0,0)');
-  g.fillStyle = gl; g.fillRect(0, bandTop, W, FEED_BAND_H);
-  shRound(g, 24, safeTop + 24, W - 48, SAFE_H - 48, 36);
-  g.lineWidth = 3; g.strokeStyle = 'rgba(245,200,0,.30)'; g.stroke();
+  /* Full comic-book layout: retain the original 1080px export width and tall Facebook reveal canvas. */
+  g.fillStyle = '#070b12'; g.fillRect(0, 0, W, H);
+  // Soft navy glow and restrained halftone texture behind the card.
+  const glow = g.createRadialGradient(W/2, bandTop + FEED_BAND_H*.48, 80, W/2, bandTop + FEED_BAND_H*.48, 900);
+  glow.addColorStop(0, '#142b3a'); glow.addColorStop(.72, '#0b1420'); glow.addColorStop(1, '#05070b');
+  g.fillStyle = glow; g.fillRect(0, bandTop, W, FEED_BAND_H);
+  // The safe-area becomes a proper framed poster panel rather than a loose outline.
+  shRound(g, 28, safeTop + 26, W - 56, SAFE_H - 52, 42);
+  g.fillStyle = '#101b29'; g.fill(); g.lineWidth = 14; g.strokeStyle = '#ffd90e'; g.stroke();
+  // Inner keyline and chunky corner brush strokes create the approved pop-art frame.
+  shRound(g, 52, safeTop + 50, W - 104, SAFE_H - 100, 30);
+  g.lineWidth = 3; g.strokeStyle = 'rgba(32,199,217,.75)'; g.stroke();
+  shBrush(g, 210, safeTop + 58, 360, '#ffd90e', -.16);
+  shBrush(g, W - 205, safeBot - 62, 330, '#ffd90e', 3.22);
+  // Halftone corners, with clear negative space around the question text.
+  g.save();
+  for (const side of [0,1]) for (let yy=safeTop+100; yy<safeTop+300; yy+=23) for (let xx=0; xx<155; xx+=23) {
+    const dx=side ? W-xx : xx; g.beginPath(); g.arc(dx,yy,Math.max(1.8,4.5-xx/48),0,Math.PI*2);
+    g.fillStyle=side?'rgba(32,199,217,.55)':'rgba(165,28,114,.7)'; g.fill();
+  }
+  g.restore();
+  // Comic accents sit on the corners, not over the copy.
+  shQuestionDoodle(g, 94, safeTop + 350, 98, '#20c7d9', -.12);
+  shQuestionDoodle(g, W - 94, safeBot - 340, 104, '#ffd90e', .12);
+  shStar(g, 105, safeTop + 455, 30, '#a51c72'); shStar(g, W-105, safeBot-235, 34, '#20c7d9');
+  shBurst(g, 155, safeTop + 210, .8, '#20c7d9', 3, -.5);
+  shBurst(g, W-150, safeBot-170, .85, '#a51c72', 3, 2.8);
 
   /* hidden top: line 1 round + question number, line 2 category + points */
   const topPills = [];
@@ -2174,93 +2212,88 @@ async function drawShareImage(r) {
 
   g.fillStyle = '#f5c800'; g.fillRect(0, bandTop - 3, W, 6);
 
-  /* feed: compact header + gold rule */
-  const hy = safeTop + 80, lh = 110;
+  /* Feed-visible section: branded yellow banner, category/points chips, and a contained question panel. */
+  const hy = safeTop + 76, lh = 94;
   const lw = logo ? lh * (logo.width / logo.height) : 0;
   let ts = 72, tw, total;
-  for (;;) {
-    g.font = `900 ${ts}px ${SH_FONT}`;
-    tw = g.measureText(SHARE_TITLE).width;
-    total = lw + (logo ? 28 : 0) + tw;
-    if (total <= W - 200 || ts <= 44) break;
-    ts -= 2;
+  for (;;) { g.font = `900 ${ts}px ${SH_FONT}`; tw = g.measureText(SHARE_TITLE).width; total = lw + (logo ? 22 : 0) + tw; if (total <= W-190 || ts <= 42) break; ts -= 2; }
+  // Brush banner behind the brand, with a crisp dark outline.
+  g.save(); g.translate(W/2, hy+lh/2); g.rotate(-.018); shRound(g, -Math.min(450,total/2+42), -lh*.58, Math.min(900,total+84), lh*1.16, 18);
+  g.fillStyle='#ffd90e'; g.fill(); g.lineWidth=5; g.strokeStyle='#050505'; g.stroke(); g.restore();
+  let hx=(W-total)/2;
+  if (logo) { g.drawImage(logo,hx,hy,lw,lh); hx += lw+22; }
+  g.textAlign='left'; g.textBaseline='middle'; g.fillStyle='#050505'; g.font=`900 ${ts}px ${SH_FONT}`; g.fillText(SHARE_TITLE,hx,hy+lh/2+3);
+  // Small comic stars flank the brand strip.
+  shStar(g, 112, hy+lh/2, 25, '#a51c72'); shStar(g, W-112, hy+lh/2, 25, '#20c7d9');
+  const ruleY = hy + lh + 38;
+  g.fillStyle='#20c7d9'; g.fillRect(145,ruleY,W-290,4);
+  let nextY=ruleY+26;
+  // Category and points are separate high-contrast badges, matching the approved mock-up.
+  const badges=[];
+  if(cat) badges.push({text:cat.toUpperCase(), fill:'#20c7d9', ink:'#07111b'});
+  if(pts) badges.push({text:pts+(pts==='1'?' PT':' PTS'),fill:'#a51c72',ink:'#ffffff'});
+  if(badges.length){
+    g.font=`900 31px ${SH_FONT}`;
+    const gap=18, widths=badges.map(b=>Math.max(150,g.measureText(b.text).width+56));
+    const all=widths.reduce((a,b)=>a+b,0)+gap*(widths.length-1); let bx=(W-all)/2;
+    badges.forEach((b,i)=>{const bw=widths[i], bh=62; shRound(g,bx,nextY,bw,bh,18);g.fillStyle=b.fill;g.fill();g.lineWidth=4;g.strokeStyle='#050505';g.stroke();g.fillStyle=b.ink;g.textAlign='center';g.textBaseline='middle';g.font=`900 31px ${SH_FONT}`;g.fillText(b.text,bx+bw/2,nextY+bh/2+2);bx+=bw+gap;});
+    nextY+=62;
   }
-  let hx = (W - total) / 2;
-  if (logo) { g.drawImage(logo, hx, hy, lw, lh); hx += lw + 28; }
-  g.textAlign = 'left'; g.textBaseline = 'middle'; g.fillStyle = '#f5c800';
-  g.fillText(SHARE_TITLE, hx, hy + lh / 2 + 4);
-
-  const ruleY = hy + lh + 36;
-  const rg = g.createLinearGradient(90, 0, W - 90, 0);
-  rg.addColorStop(0, 'rgba(245,200,0,0)'); rg.addColorStop(.5, '#f5c800'); rg.addColorStop(1, 'rgba(245,200,0,0)');
-  g.fillStyle = rg; g.fillRect(90, ruleY, W - 180, 3);
-
-  /* feed: category badge (replaces the old QUESTION badge) */
-  let nextY = ruleY + 3;
-  if (cat) {
-    const catUp = cat.toUpperCase();
-    let bsz = 38, bw;
-    for (;;) {
-      g.font = `900 ${bsz}px ${SH_FONT}`;
-      bw = shSpacedW(g, catUp, bsz * 0.13) + 90;
-      if (bw <= W - 200 || bsz <= 24) break;
-      bsz -= 2;
-    }
-    const bh = 76, by = ruleY + 40;
-    shRound(g, (W - bw) / 2, by, bw, bh, bh / 2); g.fillStyle = col; g.fill();
-    g.fillStyle = '#0d0b00'; g.textBaseline = 'middle';
-    shSpaced(g, catUp, W / 2, by + bh / 2 + 2, bsz * 0.13, 'center');
-    nextY = by + bh;
-  }
-
-  /* feed: question (balanced lines) + optional option pills */
-  const QLH = 1.32;
-  const qTop = nextY + 50, qBot = safeBot - 180;
-  const pills = opts ? shPills(g, opts, W - 240, 500) : null, gapQ = pills ? 36 : 0;
-  const qf = shFit(g, q, 800, W - 180, qBot - qTop - (pills ? pills.height + gapQ : 0), 96, 44, QLH, true);
-  const qh = qf.lines.length * qf.size * QLH, blockH = qh + (pills ? gapQ + pills.height : 0);
-  const y0 = qTop + (qBot - qTop - blockH) / 2;
-  g.fillStyle = '#fff8e0'; g.textAlign = 'center'; g.textBaseline = 'top';
-  g.font = `800 ${qf.size}px ${SH_FONT}`;
-  qf.lines.forEach((ln, i) => g.fillText(ln, W / 2, y0 + i * qf.size * QLH));
-  if (pills) shDrawPills(g, pills, y0 + qh + gapQ);
+  // Large inset question panel is the main visual, with a yellow top label and cyan keyline.
+  const panelX=92, panelY=nextY+36, panelW=W-184, panelBottom=safeBot-165, panelH=panelBottom-panelY;
+  shRound(g,panelX,panelY,panelW,panelH,34); g.fillStyle='#08111c'; g.fill(); g.lineWidth=6; g.strokeStyle='#20c7d9'; g.stroke();
+  // Yellow corner tabs / comic bursts are attached to the panel frame.
+  g.save(); g.beginPath(); g.moveTo(panelX+34,panelY); g.lineTo(panelX+230,panelY); g.lineTo(panelX+194,panelY+16); g.lineTo(panelX+48,panelY+16); g.closePath(); g.fillStyle='#ffd90e'; g.fill();
+  g.beginPath(); g.moveTo(panelX+panelW-34,panelBottom); g.lineTo(panelX+panelW-230,panelBottom); g.lineTo(panelX+panelW-194,panelBottom-16); g.lineTo(panelX+panelW-48,panelBottom-16); g.closePath(); g.fill(); g.restore();
+  const QLH=1.27;
+  const pills=opts?shPills(g,opts,W-260,420):null, gapQ=pills?30:0;
+  const qTop=panelY+76, qBot=panelBottom-64;
+  const qf=shFit(g,q,800,panelW-100,qBot-qTop-(pills?pills.height+gapQ:0),94,24,QLH,true);
+  const qh=qf.lines.length*qf.size*QLH, blockH=qh+(pills?gapQ+pills.height:0);
+  const y0=qTop+(qBot-qTop-blockH)/2;
+  g.fillStyle='#fff8e8'; g.textAlign='center'; g.textBaseline='top'; g.font=`900 ${qf.size}px ${SH_FONT}`;
+  qf.lines.forEach((ln,i)=>g.fillText(ln,W/2,y0+i*qf.size*QLH));
+  if(pills) shDrawPills(g,pills,y0+qh+gapQ);
 
   /* feed: tap prompt as an outlined pill with a chevron */
-  const ph = 84, pcy = safeBot - 100, ptxt = 'Tap the image to reveal the answer';
-  g.font = `700 38px ${SH_FONT}`;
+  const ph = 78, pcy = safeBot - 92, ptxt = 'TAP IMAGE TO REVEAL ANSWER';
+  g.font = `900 32px ${SH_FONT}`;
   const ptw = g.measureText(ptxt).width, pww = ptw + 28 + 26 + 100, pxx = (W - pww) / 2;
   shRound(g, pxx, pcy - ph / 2, pww, ph, ph / 2);
-  g.fillStyle = 'rgba(245,200,0,.08)'; g.fill(); g.lineWidth = 3; g.strokeStyle = 'rgba(245,200,0,.55)'; g.stroke();
-  g.fillStyle = '#e8d98a'; g.textAlign = 'left'; g.textBaseline = 'middle';
+  g.fillStyle = '#ffd90e'; g.fill(); g.lineWidth = 4; g.strokeStyle = '#050505'; g.stroke();
+  g.fillStyle = '#050505'; g.textAlign = 'left'; g.textBaseline = 'middle';
   g.fillText(ptxt, pxx + 50, pcy + 2);
   const chx = pxx + 50 + ptw + 28 + 13;
   g.beginPath(); g.moveTo(chx - 13, pcy - 6); g.lineTo(chx, pcy + 8); g.lineTo(chx + 13, pcy - 6);
-  g.lineWidth = 5; g.lineCap = 'round'; g.lineJoin = 'round'; g.strokeStyle = '#f5c800'; g.stroke();
+  g.lineWidth = 5; g.lineCap = 'round'; g.lineJoin = 'round'; g.strokeStyle = '#050505'; g.stroke();
 
   g.save(); g.setLineDash([26, 18]); g.strokeStyle = '#4a3c00'; g.lineWidth = 5;
   g.beginPath(); g.moveTo(0, bandBot + 2); g.lineTo(W, bandBot + 2); g.stroke(); g.restore();
 
   /* hidden bottom: answer card with green accent bar */
   const cardY = bandBot + 36, cardH = pad - 72;
-  shRound(g, CARD_X, cardY, CARD_W, cardH, 28);
-  g.fillStyle = 'rgba(255,248,224,.06)'; g.fill(); g.lineWidth = 2; g.strokeStyle = 'rgba(245,200,0,.18)'; g.stroke();
+  shRound(g, CARD_X, cardY, CARD_W, cardH, 34);
+  g.fillStyle = '#101b29'; g.fill(); g.lineWidth = 10; g.strokeStyle = '#ffd90e'; g.stroke();
+  shRound(g, CARD_X+18, cardY+18, CARD_W-36, cardH-36, 24); g.lineWidth=3; g.strokeStyle='#20c7d9'; g.stroke();
   g.save(); shRound(g, CARD_X, cardY, CARD_W, cardH, 28); g.clip();
-  g.fillStyle = '#4ade80'; g.fillRect(CARD_X, cardY, 12, cardH); g.restore();
+  g.fillStyle = '#20c7d9'; g.fillRect(CARD_X, cardY, 18, cardH); g.restore();
+  shBurst(g, CARD_X + CARD_W - 95, cardY + 92, 1.05, '#ffd500', 3, -0.55);
+  shStar(g, CARD_X + CARD_W - 72, cardY + cardH - 64, 28, '#00e89a');
 
   const afh = af.lines.length * af.size * 1.2, efh = ef ? ef.lines.length * ef.size * 1.3 : 0;
   const contentH = 52 + afh + (ex ? 56 + 16 + efh : 0);
   const top = cardY + Math.max(28, (cardH - contentH) / 2), ansTop = top + 52;
   g.textAlign = 'left'; g.textBaseline = 'alphabetic';
-  g.font = `800 30px ${SH_FONT}`; g.fillStyle = '#4ade80'; shSpaced(g, 'ANSWER', TX, top + 28, 4, 'left');
-  g.font = `900 ${af.size}px ${SH_FONT}`; g.fillStyle = '#f5c800'; g.textBaseline = 'top';
+  g.font = `900 30px ${SH_FONT}`; g.fillStyle = '#20c7d9'; shSpaced(g, 'ANSWER', TX, top + 28, 4, 'left');
+  g.font = `900 ${af.size}px ${SH_FONT}`; g.fillStyle = '#ffd90e'; g.textBaseline = 'top';
   af.lines.forEach((ln, i) => g.fillText(ln, TX, ansTop + i * af.size * 1.2));
   if (ex) {
     const ry = ansTop + afh + 16;
-    g.fillStyle = 'rgba(245,200,0,.2)'; g.fillRect(TX, ry, TW, 2);
-    g.textBaseline = 'alphabetic'; g.font = `800 26px ${SH_FONT}`; g.fillStyle = '#fff8e0';
+    g.fillStyle = '#a51c72'; g.fillRect(TX, ry, TW, 4);
+    g.textBaseline = 'alphabetic'; g.font = `900 26px ${SH_FONT}`; g.fillStyle = '#ffd90e';
     shSpaced(g, 'DID YOU KNOW?', TX, ry + 14 + 26, 3, 'left');
     const et = ry + 14 + 26 + 16;
-    g.font = `600 ${ef.size}px ${SH_FONT}`; g.fillStyle = '#c9bb7c'; g.textBaseline = 'top';
+    g.font = `700 ${ef.size}px ${SH_FONT}`; g.fillStyle = '#f1f5f9'; g.textBaseline = 'top';
     ef.lines.forEach((ln, i) => g.fillText(ln, TX, et + i * ef.size * 1.3));
   }
   return c;
